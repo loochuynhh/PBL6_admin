@@ -26,7 +26,7 @@ import IconBox from "components/icons/IconBox";
 import { HorizonLogo } from "components/icons/Icons";
 import { SidebarResponsive } from "components/sidebar/Sidebar";
 import { SidebarContext } from "contexts/SidebarContext";
-
+import { Logo } from 'assets/img/logo.svg';
 // Assets
 import { GoChevronDown, GoChevronRight } from "react-icons/go";
 import routes from "routes.js";
@@ -101,7 +101,11 @@ export default function AuthNavbar(props) {
       alignItems='center'
       color={mainText}>
       <Stack direction='row' spacing='12px' align='center' justify='center'>
-        <HorizonLogo h='26px' w='175px' color={logoColor} />
+      <div className='flex-shrink-0'>
+        <Link to={"/"}>
+          <Logo w={120} h={90} className='w-24 sm:w-28 lg:w-36' />
+        </Link>
+      </div>
       </Stack>
       <Text fontsize='sm' mt='3px'>
         {logoText}

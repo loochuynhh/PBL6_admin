@@ -5,9 +5,10 @@ import Footer from 'components/footer/FooterAdmin.js';
 import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
+import axios from 'axios';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -15,12 +16,45 @@ export default function Dashboard(props) {
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null); 
+  const { onOpen } = useDisclosure();
+
+  const checkUserRole = async () => {
+    const accessToken = localStorage.getItem('accessToken'); 
+    if (accessToken) {
+      try {
+        const response = await axios.get('/api/roles', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, 
+          },
+        });
+        if (response.data) {
+          setIsLoggedIn(true); 
+        } else {
+          setIsLoggedIn(false); 
+        }
+      } catch (error) {
+        console.error('Error checking user role:', error);
+        setIsLoggedIn(false);
+      }
+    } else {
+      setIsLoggedIn(false); 
+    }
+  };
+
+  useEffect(() => {
+    checkUserRole();
+  }, []);
+
+  if (isLoggedIn === false) {
+    return <Navigate to="/auth/sign-in" replace />;
+  }
   // functions for changing the states from components
   const getRoute = () => {
     return window.location.pathname !== '/admin/full-screen-maps';
   };
   const getActiveRoute = (routes) => {
-    let activeRoute = 'Default Brand Text';
+    let activeRoute = 'Main Dashboard';
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveRoute = getActiveRoute(routes[i].items);
@@ -103,7 +137,6 @@ export default function Dashboard(props) {
     });
   };
   document.documentElement.dir = 'ltr';
-  const { onOpen } = useDisclosure();
   document.documentElement.dir = 'ltr';
   return (
     <Box>
@@ -160,9 +193,6 @@ export default function Dashboard(props) {
                 </Routes>
               </Box>
             ) : null}
-            <Box>
-              <Footer />
-            </Box>
           </Box>
         </SidebarContext.Provider>
       </Box>

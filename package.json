@@ -30,7 +30,8 @@
     "react-scripts": "^5.0.0",
     "stylis": "^4.3.2",
     "stylis-plugin-rtl": "^2.0.2",
-    "web-vitals": "^4.2.2"
+    "web-vitals": "^4.2.2",
+    "axios": "^1.7.7"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -67,5 +68,6 @@
     "chokidar": "^3.6.0",
     "gh-pages": "^6.1.1",
     "micromatch": "^4.0.7"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }

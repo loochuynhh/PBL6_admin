@@ -32,7 +32,7 @@ export function ItemContent(props) {
             fontSize={{ base: "sm", md: "sm" }}
             lineHeight='100%'
             color={textColor}>
-            A new update for your downloaded item is available!
+            Read it right now!
           </Text>
         </Flex>
       </Flex>
