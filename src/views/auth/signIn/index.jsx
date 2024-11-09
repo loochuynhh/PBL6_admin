@@ -1,6 +1,5 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios"; // Import axios
 import {
   Box,
   Button,
@@ -16,12 +15,14 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { HSeparator } from "components/separator/Separator";
+// import { HSeparator } from "components/separator/Separator";
 import DefaultAuth from "layouts/auth/Default";
 import illustration from "assets/img/auth/auth.png";
-import { FcGoogle } from "react-icons/fc";
+// import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
+import { instance } from "../../../IPHelper";
+import axios from "axios";
 
 function SignIn() { // Không cần nhận props
   const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
@@ -36,6 +37,7 @@ function SignIn() { // Không cần nhận props
 
   const handleLogin = async () => {
     try {
+      debugger
       const response = await axios.post("/api/auth/login", {
         username: email,
         password: password,

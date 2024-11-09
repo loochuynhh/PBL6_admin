@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
 import axios from 'axios';
+import { instance } from '../../IPHelper';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
