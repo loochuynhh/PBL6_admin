@@ -37,7 +37,6 @@ function SignIn() { // Không cần nhận props
 
   const handleLogin = async () => {
     try {
-      debugger
       const response = await axios.post("/api/auth/login", {
         username: email,
         password: password,

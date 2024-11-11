@@ -35,7 +35,9 @@ export default function Projects(props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday)
@@ -51,7 +53,7 @@ export default function Projects(props) {
     }
 
     return age
-    }
+  }
 
   useEffect(() => {
     const getUserData = async () => {
@@ -79,7 +81,7 @@ export default function Projects(props) {
 
   const fetchUserAttribute = async (userId) => {
     try {
-      const userAttribute = await instance.get(`/api/user-attributes/all?userId.equals=${userId}`, {
+      const userAttribute = await axios.get(`/api/user-attributes/all?userId.equals=${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -97,6 +99,27 @@ export default function Projects(props) {
     setIsModalOpen(true);
 
     fetchUserAttribute(user.id)
+  };
+
+  const handleDeleteClick = (userId) => {
+    setSelectedUserId(userId);
+    setIsModalDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`/api/users/${selectedUserId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      // Refresh the user data after deletion
+      setUserData(userData.filter(user => user.id !== selectedUserId));
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error deleting user", err);
+      setError("Error deleting user");
+    }
   };
 
   const totalPages = Math.ceil(totalUsers / pageSize);
@@ -144,6 +167,7 @@ export default function Projects(props) {
           level={user.level}
           Active={user.isActivated}
           onClick={() => handleUserClick(user)}
+          onDeleteClick={() => handleDeleteClick(user.id)}
         />
       ))}
       {/* <Project
@@ -222,6 +246,26 @@ export default function Projects(props) {
           <ModalFooter>
             <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
               Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Confirm Delete Modal */}
+      <Modal isOpen={isModalDeleteOpen} onClose={() => setIsModalDeleteOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Are you sure you want to delete this user?
+          </ModalBody>
+          <ModalFooter pr=".5rem">
+            <Button colorScheme="red" onClick={handleConfirmDelete}>
+              Yes, Delete
+            </Button>
+            <Button variant="ghost" border="1px solid #333" ml='.5rem' onClick={() => setIsModalDeleteOpen(false)}>
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>

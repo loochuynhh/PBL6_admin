@@ -18,7 +18,7 @@ import { MdDelete } from "react-icons/md";
 import defaultAvatar from "assets/img/profile/default avatar.jpg";
 
 export default function Project(props) {
-  const { number, avaUrl, username, email, firstName, lastName, age, level, Active, onClick } = props;
+  const { number, avaUrl, username, email, firstName, lastName, age, level, Active, onClick, onDeleteClick } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.200";
@@ -28,6 +28,7 @@ export default function Project(props) {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+
   return (
     <Card
       onClick={onClick}
@@ -113,7 +114,12 @@ export default function Project(props) {
           variant='no-hover'
           me='16px'
           ms='auto'
-          p='0px !important'>
+          p='0px !important'
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering the onClick of the card
+            onDeleteClick();
+          }}
+        >
           <Icon as={MdDelete} color='secondaryGray.500' h='25px' w='25px' mb='4px'/>
         </Link>
       </Flex>
