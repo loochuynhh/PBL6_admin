@@ -1,109 +1,143 @@
 import {
-  Box,
-  Flex,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useColorModeValue,
   Button,
-  Input,
-  FormControl,
-  FormLabel,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
 } from '@chakra-ui/react';
 import {
-  createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import Card from 'components/card/Card';
-import BannerExercise from 'components/menu/BannerExercise';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import TableRender from 'components/tableRender/TableRender';
+import TableHeader from 'components/tableRender/TableHeader';
+import TableColumn from 'components/tableRender/TableColumn';
+import ShowVideoModal from 'components/modal/ShowVideoModal';
+import NotificationModal from 'components/modal/NotificationModal';
+import AddOrEditExerciseModal from 'components/modal/AddOrEditExerciseModal';
+import DeleteConfirmationModal from 'components/modal/DeleteConfirmationModal';
 
-const columnHelper = createColumnHelper();
-
-export default function ExerciseTable() {
-  const [data, setData] = React.useState([]); 
-  const [loading, setLoading] = React.useState(true);
-  const [sorting, setSorting] = React.useState([]);
-  const [isOpen, setIsOpen] = React.useState(false); // State for modal
-  const [newExercise, setNewExercise] = React.useState({
+export default function ExerciseTable(props) {
+  const {planId, onBack} = props
+  const [data, setData] = useState([]);
+  const [userId, setUserId] = useState(0) 
+  const [loading, setLoading] = useState(true);
+  const [sorting, setSorting] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [currentVideoPath, setCurrentVideoPath] = useState('');
+  const [dataSelectedRow, setDataSelectedRow] = useState({})
+  const [currentExercise, setCurrentExercise] = useState({});
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+  const [isButtonAddClick, setIsButtonAddClick] = useState(false);
+  const [isButtonEditClick, setIsButtonEditClick] = useState(false)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [newExercise, setNewExercise] = useState({
     name: '',
     description: '',
-    videoPath: ''
+    videoPath: '',
+    imagePath: '',
+    userId: 0
   });
-  const toast = useToast(); // Toast for notifications
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const accessToken = localStorage.getItem('accessToken'); 
 
-  const columns = [
-    columnHelper.accessor('name', {
-      id: 'name',
-      header: () => (
-        <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
-          NAME
-        </Text>
-      ),
-      cell: (info) => (
-        <Flex align="center">
-          <Text color={textColor} fontSize="sm" fontWeight="700">
-            {info.getValue()}
-          </Text>
-        </Flex>
-      ),
-    }),
-    columnHelper.accessor('description', {
-      id: 'description',
-      header: () => (
-        <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
-          DESCRIPTION
-        </Text>
-      ),
-      cell: (info) => (
-        <Text color={textColor} fontSize="sm" fontWeight="700">
-          {info.getValue()}
-        </Text>
-      ),
-    }),
-    columnHelper.accessor('videoPath', {
-      id: 'videoPath',
-      header: () => (
-        <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
-          VIDEO
-        </Text>
-      ),
-      cell: (info) => (
-        <Box>
-          <Text color={textColor} fontSize="sm" fontWeight="700">
-            <a href={info.getValue()} target="_blank" rel="noopener noreferrer">
-              View Video
-            </a>
-          </Text>
-        </Box>
-      ),
-    }),
-  ];
+  const handleEditExercise = (exercise_plan) => {
+    setCurrentExercise(exercise_plan.exercise);
+    setIsOpen(true)
+    setIsButtonEditClick(true)
+  };
+
+  const handleDeleteExercise = (rowId) => {
+    setIsModalDeleteOpen(true)
+    setSelectedExerciseId(rowId)
+  }
+
+  const handleOpenVideoModal = (dataSelected) => {
+    setDataSelectedRow(dataSelected)
+    setCurrentVideoPath(dataSelected.exercise.videoPath)
+    setIsVideoModalOpen(true)
+  }
+
+  const handleOpenModalAddWorkout = () => {
+    setIsButtonAddClick(true);
+    setIsOpen(true);
+  };
+
+  const handleCloseModalPlan = () => {
+    setIsOpen(false);
+    setIsButtonEditClick(false);
+    setIsButtonAddClick(false);
+    setNewExercise({ name: '', description: '', videoPath: '' });
+  }
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`/api/plans/${selectedExerciseId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      setData((prev) => prev.filter((exercise) => exercise.id !== selectedExerciseId));
+      setIsSuccess(true);
+      setNotificationMessage("The exercise has been deleted successfully.");
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      setIsSuccess(false);
+      setNotificationMessage("There was an error deleting the exercise.");
+    } finally {
+      setIsNotificationOpen(true);
+      setIsOpen(false);
+      setIsModalDeleteOpen(false)
+    }
+  };
+
+  const handleUpdateExercise = async () => {
+    try {
+      const response = await axios.put(`/api/plans/${currentExercise.id}`, currentExercise, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      setData((prev) => prev.map((exercise) => (exercise.id === currentExercise.id ? response.data : exercise)));
+      setCurrentExercise({});
+      setIsSuccess(true);
+      setNotificationMessage("The workout has been updated successfully.");
+    } catch (error) {
+      console.error('Error updating workout:', error);
+      setIsSuccess(false);
+      setNotificationMessage("There was an error updating the plan.");
+    } finally {
+      setIsNotificationOpen(true);
+      setIsOpen(false);
+    }
+  };
 
   // Fetch data from API
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('/public/api/exercises/all'); 
-        setData(response.data); 
+        const [{ data: exercisePlanData }, { data: userData }] = await Promise.all([
+          axios.get(`/api/exercise-plans?planId.equals=${planId}&page=0&size=20`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          }),
+          // axios.get(`/api/account`, {
+          //   headers: {
+          //     Authorization: `Bearer ${accessToken}`
+          //   }
+          // })
+        ]) 
+        setData(exercisePlanData.data);
+        // setUserId(userData.id)
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -112,46 +146,34 @@ export default function ExerciseTable() {
     };
 
     fetchData();
-  }, []);
+  }, [planId]);
 
-  const accessToken = localStorage.getItem('accessToken'); 
   const handleAddExercise = async () => {
-    const options = {
-      method: 'POST',
-      url: 'http://localhost:8080/api/exercises',
-      headers: {
-        Authorization: `Bearer ${accessToken}`, 
-      },
-      data: {
-        name: newExercise.name,
-        description: newExercise.description,
-        videoPath: newExercise.videoPath,
-      },
-    };
-  
     try {
-      const response = await axios.request(options);
-      setData((prev) => [...prev, response.data]);
-      setNewExercise({ name: '', description: '', videoPath: '' }); // Resetting the form
-      toast({
-        title: "Exercise added.",
-        description: "New exercise has been added successfully.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      setIsOpen(false); 
-    } catch (error) {
-      console.error('Error adding exercise:', error);
-      toast({
-        title: "Error.",
-        description: "There was an error adding the exercise.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      const [{ data: exercise }, { data: exercise_plan }, {data: userData}] = await Promise.all([
+        axios.get('/api/plans/all', {
+          headers: {
+            Authorization: `Bearer ${accessToken}` 
+          }
+        }),
+        // axios.get(`/api/plans?page=${currentPage}&size=${pageSize}`, { 
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}`
+        //   }
+        // }),
+        axios.get(`/api/account`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
+      ]);
+    }
+    catch (err) {
+      console.log("Error adding exercise", err)
     }
   };
+
+  const columns = TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
 
   const table = useReactTable({
     data,
@@ -165,100 +187,59 @@ export default function ExerciseTable() {
   });
 
   if (loading) {
-    return <Text>Loading...</Text>; // Display loading message while data is being fetched
+    return <Text>Loading...</Text>;
   }
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-      <Flex px="25px" mb="8px" justifyContent="space-between" align="center">
-        <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%">
-          Exercise Table
-        </Text>
-        <BannerExercise onOpenAddExercise={() => setIsOpen(true)} />
-      </Flex>
+      <Button w='6.5rem' onClick={onBack} leftIcon={<ArrowBackIcon boxSize="15px" />}>
+        Back
+      </Button>
+      <TableHeader
+        title="Exercise Table"
+        onOpenAdd={handleOpenModalAddWorkout}
+      />
 
-      {/* Modal for adding new exercise */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Exercise</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl mb="4">
-              <FormLabel>Name</FormLabel>
-              <Input 
-                value={newExercise.name} 
-                onChange={(e) => setNewExercise({ ...newExercise, name: e.target.value })} 
-                placeholder="Exercise Name" 
-              />
-            </FormControl>
-            <FormControl mb="4">
-              <FormLabel>Description</FormLabel>
-              <Input 
-                value={newExercise.description} 
-                onChange={(e) => setNewExercise({ ...newExercise, description: e.target.value })} 
-                placeholder="Exercise Description" 
-              />
-            </FormControl>
-            <FormControl mb="4">
-              <FormLabel>Video Link</FormLabel>
-              <Input 
-                value={newExercise.videoPath} 
-                onChange={(e) => setNewExercise({ ...newExercise, videoPath: e.target.value })} 
-                placeholder="Video Link" 
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddExercise}>
-              Add Exercise
-            </Button>
-            <Button onClick={() => setIsOpen(false)} ml={3}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <AddOrEditExerciseModal
+        isOpen={isOpen}
+        onClose={handleCloseModalPlan}
+        isButtonAddClick={isButtonAddClick}
+        isButtonEditClick={isButtonEditClick}
+        newExercise={newExercise}
+        setNewExercise={setNewExercise}
+        currentExercise={currentExercise}
+        setCurrentExercise={setCurrentExercise}
+        handleAddExercise={handleAddExercise}
+        handleUpdateExercise={handleUpdateExercise}
+      />
 
-      <Box>
-        <Table variant="simple" color="gray.500" mb="24px" mt="12px">
-          <Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    pe="10px"
-                    borderColor={borderColor}
-                    cursor="pointer"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    <Flex justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      { {
-                        asc: '🔼',
-                        desc: '🔽',
-                      }[header.column.getIsSorted()] ?? null}
-                    </Flex>
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </Thead>
-          <Tbody>
-            {table.getRowModel().rows.slice(0, 25).map((row) => (
-              <Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Td key={cell.id} borderColor={borderColor}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
-                ))}
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+      <TableRender
+        table={table} 
+        onRowClick={null}
+        borderColor={borderColor}
+        hover={false}
+      />
+
+      <ShowVideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        currentVideoPath={currentVideoPath}
+        dataSelectedRow={dataSelectedRow}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isModalDeleteOpen}
+        onClose={() => setIsModalDeleteOpen(false)}
+        handleConfirmDelete={handleConfirmDelete}
+        object='Exercise'
+      />
+
+      <NotificationModal
+        isOpen={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+        message={notificationMessage}
+        isSuccess={isSuccess}
+      />
     </Card>
   );
 }

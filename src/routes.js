@@ -36,6 +36,7 @@ const routes = [
         width="20px"
         height="20px"
         color="inherit"
+        mb='1rem'
       />
     ),
     component: <NFTMarketplace />,
@@ -44,7 +45,7 @@ const routes = [
   {
     name: 'Data Tables',
     layout: '/admin',
-    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" mb='1rem'/>,
     path: '/data-tables',
     component: <DataTables />,
   },
@@ -52,21 +53,21 @@ const routes = [
     name: 'Profile',
     layout: '/admin',
     path: '/profile',
-    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" mb='1rem'/>,
     component: <Profile />,
   },
   {
     name: 'Sign In',
     layout: '/auth',
     path: '/sign-in',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" mb='1rem'/>,
     component: <SignInCentered />,
   },
   {
     name: 'RTL Admin',
     layout: '/rtl',
     path: '/rtl-default',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" mb='1rem'/>,
     component: <RTL />,
   },
 ];

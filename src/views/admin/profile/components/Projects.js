@@ -3,7 +3,6 @@ import {
   Text,
   useColorModeValue,
   Button,
-  Flex,
   Spinner,
   Grid,
   Modal,
@@ -20,17 +19,20 @@ import Project from "views/admin/profile/components/Project";
 // import Project1 from "assets/img/profile/Project1.png"
 import Banner from "views/admin/profile/components/Banner";
 import banner from "assets/img/auth/banner.png";
-import avatar from "assets/img/avatars/avatar4.png";
-import { instance } from "IPHelper";
+import Pagination from "components/pagination/Paginantion";
+import DeleteConfirmationModal from "components/modal/DeleteConfirmationModal";
+import TableHeader from "components/tableRender/TableHeader";
+import TableRender from "components/tableRender/TableRender";
+import UserTableColumns from "components/tableRender/TableColumnProfileUser";
 
-export default function Projects(props) {
+export default function Projects() {
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const [userData, setUserData] = useState([]);
   const [userAttribute, setUserAttribute] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(20);
+  const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,16 +60,22 @@ export default function Projects(props) {
   useEffect(() => {
     const getUserData = async () => {
       setLoading(true);
-      setError(null); // Reset error state before fetching
+      setError(null);
 
       try {
+        const allUser = await axios.get(`/api/users/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        })
+
         const userData = await axios.get(`/api/users?id.greaterThan=1050&page=${currentPage}&size=${pageSize}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }
         });
-        setUserData(userData.data || []);
-        setTotalUsers(userData.data.totalElements || 0);
+        setUserData(userData.data);
+        setTotalUsers(allUser.data.length);
       } catch (err) {
         console.error("Error fetching user data", err);
         setError("Error fetching user data");
@@ -122,6 +130,21 @@ export default function Projects(props) {
     }
   };
 
+  const handleInputPageChange = (event) => { 
+    setTimeout(() => {
+      const value = event.target.value;
+      const pageNumber = Number(value) - 1;
+
+      if (pageNumber >= 0 && pageNumber < totalPages) {
+        setCurrentPage(pageNumber);
+      } else if (value === "") {
+        setCurrentPage(0);
+      }
+    }, 1500)
+  }
+
+  // const columns = UserTableColumns(handleDeleteClick); // Pass the handleDelete function to the columns
+
   const totalPages = Math.ceil(totalUsers / pageSize);
 
   if (loading) return <Spinner color="blue.500" />;
@@ -129,14 +152,7 @@ export default function Projects(props) {
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
-      <Text
-        color={textColorPrimary}
-        fontWeight='bold'
-        fontSize='2xl'
-        mt='10px'
-        mb='4px'>
-        All Users
-      </Text>
+      <TableHeader title="All User Table" />
       <Grid
         templateColumns="4% 6.5% 12.5% 25.5% 10% 11% 8.6% 10.2% 7%"
         gap="0"
@@ -158,7 +174,7 @@ export default function Projects(props) {
         <Project
           key={user.id}
           number={currentPage * pageSize + index + 1}
-          avatar={user.avaUrl} // Use a default image if not available
+          avatar={user.publicAvatarUrl}
           username={user.username}
           email={user.email}
           firstName={user.firstName}
@@ -170,44 +186,15 @@ export default function Projects(props) {
           onDeleteClick={() => handleDeleteClick(user.id)}
         />
       ))}
-      {/* <Project
-          number="10"
-          image={Project1} // Use a default image if not available
-          username="tanduyngo123hehe"
-          email="tan"
-          firstName="tan"
-          lastName="Duc Nhat Long"
-          age="tan"
-          level="tan"
-        />
 
-        <Project
-          number="100"
-          image={Project1} // Use a default image if not available
-          username="tan"
-          email="tan"
-          firstName="tan"
-          lastName="tan"
-          age="tan"
-          level="INTERMEDIATE"
-        /> */}
-      <Flex justifyContent="space-between" mt="20px">
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-          isDisabled={currentPage === 0}
-        >
-          Previous
-        </Button>
-        <Text>
-          Page {currentPage + 1} of {totalPages}
-        </Text>
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          isDisabled={currentPage >= totalPages - 1}
-        >
-          Next
-        </Button>
-      </Flex>
+      {/* <TableRender data={userData} columns={columns} /> */}
+
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+        handleInputPageChange={handleInputPageChange}
+      />
 
       {/* Modal for project details */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -236,7 +223,7 @@ export default function Projects(props) {
             {selectedProject && (
               <Banner
                 banner={banner}
-                avatar={selectedProject.avaUrl}
+                avatar={selectedProject.publicAvatarUrl}
                 username={selectedProject.username}
                 fullName={`${selectedProject.firstName} ${selectedProject.lastName}`}
                 userAttribute={userAttribute}
@@ -251,25 +238,12 @@ export default function Projects(props) {
         </ModalContent>
       </Modal>
 
-      {/* Confirm Delete Modal */}
-      <Modal isOpen={isModalDeleteOpen} onClose={() => setIsModalDeleteOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Confirm Deletion</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            Are you sure you want to delete this user?
-          </ModalBody>
-          <ModalFooter pr=".5rem">
-            <Button colorScheme="red" onClick={handleConfirmDelete}>
-              Yes, Delete
-            </Button>
-            <Button variant="ghost" border="1px solid #333" ml='.5rem' onClick={() => setIsModalDeleteOpen(false)}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <DeleteConfirmationModal
+        isOpen={isModalDeleteOpen}
+        onClose={() => setIsModalDeleteOpen(false)}
+        handleConfirmDelete={handleConfirmDelete}
+        object='User'
+      />
     </Card>
   );
 }

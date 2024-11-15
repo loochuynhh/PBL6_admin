@@ -18,7 +18,7 @@ import { MdDelete } from "react-icons/md";
 import defaultAvatar from "assets/img/profile/default avatar.jpg";
 
 export default function Project(props) {
-  const { number, avaUrl, username, email, firstName, lastName, age, level, Active, onClick, onDeleteClick } = props;
+  const { number, avatar, username, email, firstName, lastName, age, level, Active, onClick, onDeleteClick } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.200";
@@ -42,7 +42,7 @@ export default function Project(props) {
     >
       <Flex align='center' direction={{ base: "column", md: "row" }}>
         <Text w="30px" mb='4px' mr="14px" textAlign="center">{number}</Text>
-        <Image h='50px' w='50px' src={avaUrl ? avaUrl : defaultAvatar} borderRadius='50%' me='13px' />
+        <Image h='50px' w='50px' src={avatar ? avatar : defaultAvatar} borderRadius='50%' me='13px' />
         <Grid
           templateColumns="15% 30% 12% 13% 10% 12% 8%"
           gap="0"
