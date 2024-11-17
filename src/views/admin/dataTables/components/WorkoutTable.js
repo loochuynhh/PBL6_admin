@@ -104,9 +104,9 @@ export default function WorkoutTable({ onRowClick }) {
     }
   };
 
-  const handleDeletePlan = (rowId) => {
+  const handleDeletePlan = (rowData) => {
     setIsModalDeleteOpen(true);
-    setSelectedPlanId(rowId);
+    setSelectedPlanId(rowData.id);
   };
 
   const handleConfirmDelete = async () => {
@@ -202,7 +202,7 @@ export default function WorkoutTable({ onRowClick }) {
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
       <TableHeader title="Plan Table" onOpenAdd={handleOpenModalAddPlan} />
-
+      
       <TableRender
         table={table}
         onRowClick={onRowClick}

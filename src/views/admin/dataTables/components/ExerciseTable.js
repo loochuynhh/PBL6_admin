@@ -31,7 +31,9 @@ export default function ExerciseTable(props) {
   const [currentVideoPath, setCurrentVideoPath] = useState('');
   const [dataSelectedRow, setDataSelectedRow] = useState({})
   const [currentExercise, setCurrentExercise] = useState({});
+  const [currentExercisePlan, setCurrentExercisePlan] = useState({});
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [selectedExercisePlanId, setSelectedExercisePlanId] = useState(null);
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
   const [isButtonAddClick, setIsButtonAddClick] = useState(false);
   const [isButtonEditClick, setIsButtonEditClick] = useState(false)
@@ -39,34 +41,44 @@ export default function ExerciseTable(props) {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [newExercise, setNewExercise] = useState({
-    name: '',
-    description: '',
-    videoPath: '',
-    imagePath: '',
+    name: null,
+    description: null,
+    videoPath: null,
+    imagePath: null,
     userId: 0
   });
+  const [newExercisePlan, setNewExercisePlan] = useState({
+    time: null,
+    dateOrder: null,
+    setCount: null,
+    repCount: null,
+    exerciseId: 0,
+    planId: 0
+  })
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const accessToken = localStorage.getItem('accessToken'); 
 
   const handleEditExercise = (exercise_plan) => {
+    setCurrentExercisePlan(exercise_plan)
     setCurrentExercise(exercise_plan.exercise);
     setIsOpen(true)
     setIsButtonEditClick(true)
   };
 
-  const handleDeleteExercise = (rowId) => {
+  const handleDeleteExercise = (rowData) => {
     setIsModalDeleteOpen(true)
-    setSelectedExerciseId(rowId)
+    setSelectedExercisePlanId(rowData.id)
+    setSelectedExerciseId(rowData.exerciseId)
   }
 
   const handleOpenVideoModal = (dataSelected) => {
     setDataSelectedRow(dataSelected)
-    setCurrentVideoPath(dataSelected.exercise.videoPath)
+    setCurrentVideoPath(dataSelected.exercise.publicVideoUrl)
     setIsVideoModalOpen(true)
   }
 
-  const handleOpenModalAddWorkout = () => {
+  const handleOpenModalAddExercise = () => {
     setIsButtonAddClick(true);
     setIsOpen(true);
   };
@@ -75,21 +87,41 @@ export default function ExerciseTable(props) {
     setIsOpen(false);
     setIsButtonEditClick(false);
     setIsButtonAddClick(false);
-    setNewExercise({ name: '', description: '', videoPath: '' });
+    setNewExercise({ 
+      name: null, 
+      description: null, 
+      videoPath: null, 
+      imagePath: null, 
+      userId: 0 
+    });
+    setNewExercisePlan({ 
+      time: null,
+      dateOrder: null,
+      setCount: null,
+      repCount: null,
+      exerciseId: 0,
+      planId: 0 
+    })
   }
 
+  
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/plans/${selectedExerciseId}`, {
+      await axios.delete(`/api/exercise-plans/${selectedExercisePlanId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+      await axios.delete(`/api/exercises/${selectedExerciseId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
       });
-      setData((prev) => prev.filter((exercise) => exercise.id !== selectedExerciseId));
+      setData((prev) => prev.filter((exercisePlan) => exercisePlan.id !== selectedExercisePlanId));
       setIsSuccess(true);
       setNotificationMessage("The exercise has been deleted successfully.");
     } catch (error) {
-      console.error('Error deleting workout:', error);
+      console.error('Error deleting exercise:', error);
       setIsSuccess(false);
       setNotificationMessage("There was an error deleting the exercise.");
     } finally {
@@ -101,19 +133,51 @@ export default function ExerciseTable(props) {
 
   const handleUpdateExercise = async () => {
     try {
-      const response = await axios.put(`/api/plans/${currentExercise.id}`, currentExercise, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      setData((prev) => prev.map((exercise) => (exercise.id === currentExercise.id ? response.data : exercise)));
+      const [{ data: updatedExercise }, { data: updatedExercisePlan }, { data: currentExerciseData }] = await Promise.all([
+        axios.put(`/api/exercises/${currentExercise.id}`, currentExercise, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }),
+        axios.put(`/api/exercise-plans/${currentExercisePlan.id}`, currentExercisePlan, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }),
+        axios.get(`/public/api/exercises/${currentExercise.id}`)
+      ])
+
+      // console.log(currentExercise.imagePath)
+      // console.log(currentExercise.videoPath)
+
+      // const formDataImage = new FormData()
+      // formDataImage.append('image', currentExercise.imagePath)
+      // await axios.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //     'Content-Type': 'multipart/form-data'
+      //   }
+      // })
+      
+      // const formDataVideo = new FormData()
+      // formDataVideo.append('video', currentExercise.videoPath)
+      // await axios.put(`/api/exercises/${currentExercise.id}/upload-video`, formDataVideo, {
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //     'Content-Type': 'multipart/form-data'
+      //   }
+      // })
+
+      const combinedData = await { ...updatedExercisePlan, exercise: currentExerciseData}
+      
+      setData((prev) => prev.map((exercisePlan) => (exercisePlan.id === currentExercisePlan.id ? combinedData : exercisePlan)));
       setCurrentExercise({});
       setIsSuccess(true);
-      setNotificationMessage("The workout has been updated successfully.");
+      setNotificationMessage("The exercise has been updated successfully.");
     } catch (error) {
-      console.error('Error updating workout:', error);
+      console.error('Error updating exercise:', error);
       setIsSuccess(false);
-      setNotificationMessage("There was an error updating the plan.");
+      setNotificationMessage("There was an error updating the exercise.");
     } finally {
       setIsNotificationOpen(true);
       setIsOpen(false);
@@ -124,20 +188,32 @@ export default function ExerciseTable(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [{ data: exercisePlanData }, { data: userData }] = await Promise.all([
+        const [{ data: exercisePlanData }, { data: userData }, { data: allExerciseData }] = await Promise.all([
           axios.get(`/api/exercise-plans?planId.equals=${planId}&page=0&size=20`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+              Authorization: `Bearer ${accessToken}`
             }
           }),
-          // axios.get(`/api/account`, {
-          //   headers: {
-          //     Authorization: `Bearer ${accessToken}`
-          //   }
-          // })
-        ]) 
-        setData(exercisePlanData.data);
-        // setUserId(userData.id)
+          axios.get(`/api/account`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }),
+          axios.get('/public/api/exercises/all')
+        ])
+
+        const exerciseMap = allExerciseData.reduce((acc, exercise) => {
+          acc[exercise.id] = exercise;
+          return acc;
+        }, {});
+
+        const combinedData = exercisePlanData.map(ex_p => ({
+          ...ex_p,
+          exercise: exerciseMap[ex_p.exerciseId] || {}
+        }))
+
+        setData(combinedData);
+        setUserId(userData.id)
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -150,31 +226,66 @@ export default function ExerciseTable(props) {
 
   const handleAddExercise = async () => {
     try {
-      const [{ data: exercise }, { data: exercise_plan }, {data: userData}] = await Promise.all([
-        axios.get('/api/plans/all', {
+      const addExercise = await axios.post('/api/exercises', 
+        { ...newExercise, imagePath: null, videoPath: null, userId: userId }, 
+        {
           headers: {
             Authorization: `Bearer ${accessToken}` 
           }
-        }),
-        // axios.get(`/api/plans?page=${currentPage}&size=${pageSize}`, { 
-        //   headers: {
-        //     Authorization: `Bearer ${accessToken}`
-        //   }
-        // }),
-        axios.get(`/api/account`, {
+        }
+      );
+
+      const formDataImage = new FormData()
+      formDataImage.append('image', newExercise.imagePath)
+      await axios.put(`/api/exercises/${addExercise.data.id}/upload-image`, formDataImage, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      
+      const formDataVideo = new FormData()
+      formDataVideo.append('video', newExercise.videoPath)
+      await axios.put(`/api/exercises/${addExercise.data.id}/upload-video`, formDataVideo, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      const response = await axios.post('/api/exercise-plans', 
+        { ...newExercisePlan, exerciseId: addExercise.data.id, planId: planId }, 
+        {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
-        })
-      ]);
-    }
+        }
+      );
+
+      const exerciseData = await axios.get(`/public/api/exercises/${addExercise.data.id}`)
+
+      const newDataEntry = {
+        ...response.data,
+        exercise: exerciseData.data
+      };
+
+      setData((prev) => [...prev, newDataEntry])
+      setIsSuccess(true)
+      setNotificationMessage('The exercise has been added successfully.')
+    } 
     catch (err) {
-      console.log("Error adding exercise", err)
+      console.log("Error adding exercise", err);
+      setIsSuccess(false);
+      setNotificationMessage("There was an error adding the exercise.");
+    } 
+    finally {
+      setIsNotificationOpen(true);
+      setIsOpen(false);
     }
   };
 
   const columns = TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
-
+  
   const table = useReactTable({
     data,
     columns,
@@ -197,9 +308,9 @@ export default function ExerciseTable(props) {
       </Button>
       <TableHeader
         title="Exercise Table"
-        onOpenAdd={handleOpenModalAddWorkout}
+        onOpenAdd={handleOpenModalAddExercise}
       />
-
+      
       <AddOrEditExerciseModal
         isOpen={isOpen}
         onClose={handleCloseModalPlan}
@@ -209,6 +320,10 @@ export default function ExerciseTable(props) {
         setNewExercise={setNewExercise}
         currentExercise={currentExercise}
         setCurrentExercise={setCurrentExercise}
+        newExercisePlan={newExercisePlan}
+        setNewExercisePlan={setNewExercisePlan}
+        currentExercisePlan={currentExercisePlan}
+        setCurrentExercisePlan={setCurrentExercisePlan}
         handleAddExercise={handleAddExercise}
         handleUpdateExercise={handleUpdateExercise}
       />

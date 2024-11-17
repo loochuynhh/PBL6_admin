@@ -9,17 +9,15 @@ const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenVideoM
 
   if (type === 'exercise') {
     columns.push(
-      columnHelper.accessor('exercise.imagePath', {
-        id: 'imagePath',
+      columnHelper.accessor('exercise.publicImageUrl', {
+        id: 'publicImageUrl',
         header: () => (
           <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
             IMAGE
           </Text>
         ),
         cell: (info) => (
-          <Box>
-            <Image h='50px' w='50px' src={info.getValue()} borderRadius='10%' me='13px' />
-          </Box>
+          <Image h='50px' w='50px' src={info.getValue()} borderRadius='10%' me='13px' />
         ),
       })
     );
@@ -104,8 +102,8 @@ const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenVideoM
     );
   } else if (type === 'exercise') {
     columns.push(
-      columnHelper.accessor('exercise.videoPath', {
-        id: 'videoPath',
+      columnHelper.accessor('exercise.publicVideoUrl', {
+        id: 'publicVideoUrl',
         header: () => (
           <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
             VIDEO
@@ -155,7 +153,7 @@ const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenVideoM
             colorScheme="red"
             onClick={(e) => {
               e.stopPropagation();
-              handleDelete(info.row.original.id);
+              handleDelete(info.row.original);
             }}
           />
         </Flex>

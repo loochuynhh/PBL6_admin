@@ -23,6 +23,10 @@ const AddOrEditExerciseModal = ({
     setNewExercise,
     currentExercise,
     setCurrentExercise,
+    newExercisePlan,
+    setNewExercisePlan,
+    currentExercisePlan,
+    setCurrentExercisePlan,
     handleAddExercise,
     handleUpdateExercise,
 }) => {
@@ -31,17 +35,21 @@ const AddOrEditExerciseModal = ({
 
     const handleInputChange = (field, value) => {
         if (isButtonAddClick) {
-            setNewExercise((prev) => ({ ...prev, [field]: value }));
+            field === 'setCount' || field === 'repCount' 
+                ? setNewExercisePlan((prev) => ({ ...prev, [field]: value }))
+                : setNewExercise((prev) => ({ ...prev, [field]: value }));
+            
         } else {
-            setCurrentExercise((prev) => ({ ...prev, [field]: value }));
+            field === 'setCount' || field === 'repCount'
+                ? setCurrentExercisePlan((prev) => ({ ...prev, [field]: value }))
+                : setCurrentExercise((prev) => ({ ...prev, [field]: value }));
         }
     };
 
     const handleFileChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
-            const fileName = file.name;
-            handleInputChange(type === 'image' ? 'imagePath' : 'videoPath', fileName);
+            handleInputChange(type === 'image' ? 'imagePath' : 'videoPath', file);
         }
     };
 
@@ -75,18 +83,35 @@ const AddOrEditExerciseModal = ({
                         />
                     </FormControl>
                     <FormControl mb="4">
-                        <FormLabel>Image Link</FormLabel>
+                        <FormLabel>Set count</FormLabel>
+                        <Input
+                            type='number'
+                            value={isButtonAddClick ? newExercisePlan.setCount : currentExercisePlan.setCount}
+                            onChange={(e) => handleInputChange('setCount', e.target.value)}
+                            placeholder="0"
+                        />
+                    </FormControl>
+                    <FormControl mb="4">
+                        <FormLabel>Rep count</FormLabel>
+                        <Input
+                            type='number'
+                            value={isButtonAddClick ? newExercisePlan.repCount : currentExercisePlan.repCount}
+                            onChange={(e) => handleInputChange('repCount', e.target.value)}
+                            placeholder="0"
+                        />
+                    </FormControl>
+                    <FormControl mb="4">
+                        <FormLabel>Image Path</FormLabel>
                         <Input
                             value={isButtonAddClick ? newExercise.imagePath : currentExercise.imagePath}
-                            placeholder="Image Link"
-                            position="relative"
+                            placeholder="Image Path"
+                            readOnly
+                            w='90%'
                         />
                         <LinkIcon
                             boxSize={5}
                             color="gray.500"
-                            position="absolute"
-                            bottom="2"
-                            right="2"
+                            ml='1rem'
                             cursor="pointer"
                             onClick={() => triggerFileInput(imageInputRef)}
                         />
@@ -98,18 +123,17 @@ const AddOrEditExerciseModal = ({
                         />
                     </FormControl>
                     <FormControl mb="4">
-                        <FormLabel>Video Link</FormLabel>
+                        <FormLabel>Video Path</FormLabel>
                         <Input
                             value={isButtonAddClick ? newExercise.videoPath : currentExercise.videoPath}
-                            placeholder="Video Link"
-                            position="relative"
+                            placeholder="Video Path"
+                            readOnly
+                            w='90%'
                         />
                         <LinkIcon
                             boxSize={5}
                             color="gray.500"
-                            position="absolute"
-                            bottom="2"
-                            right="2"
+                            ml='1rem'
                             cursor="pointer"
                             onClick={() => triggerFileInput(videoInputRef)}
                         />
