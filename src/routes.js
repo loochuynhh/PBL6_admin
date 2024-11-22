@@ -18,6 +18,7 @@ import RTL from 'views/admin/rtl';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
+import ExerciseTable from 'views/admin/exercise';
 
 const routes = [
   {
@@ -43,11 +44,18 @@ const routes = [
     secondary: true,
   },
   {
-    name: 'Data Tables',
+    name: 'Plan Table',
     layout: '/admin',
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" mb='1rem'/>,
-    path: '/data-tables',
+    path: '/plan-tables',
     component: <DataTables />,
+  },
+  {
+    name: 'Exercise Table',
+    layout: '/admin',
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" mb='1rem'/>,
+    path: '/exercise-tables',
+    component: <ExerciseTable />,
   },
   {
     name: 'Profile',

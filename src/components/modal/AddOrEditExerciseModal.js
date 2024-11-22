@@ -23,10 +23,6 @@ const AddOrEditExerciseModal = ({
     setNewExercise,
     currentExercise,
     setCurrentExercise,
-    newExercisePlan,
-    setNewExercisePlan,
-    currentExercisePlan,
-    setCurrentExercisePlan,
     handleAddExercise,
     handleUpdateExercise,
 }) => {
@@ -34,16 +30,9 @@ const AddOrEditExerciseModal = ({
     const videoInputRef = useRef(null);
 
     const handleInputChange = (field, value) => {
-        if (isButtonAddClick) {
-            field === 'setCount' || field === 'repCount' 
-                ? setNewExercisePlan((prev) => ({ ...prev, [field]: value }))
-                : setNewExercise((prev) => ({ ...prev, [field]: value }));
-            
-        } else {
-            field === 'setCount' || field === 'repCount'
-                ? setCurrentExercisePlan((prev) => ({ ...prev, [field]: value }))
-                : setCurrentExercise((prev) => ({ ...prev, [field]: value }));
-        }
+        isButtonAddClick 
+            ? setNewExercise((prev) => ({ ...prev, [field]: value }))
+            : setCurrentExercise((prev) => ({ ...prev, [field]: value }))
     };
 
     const handleFileChange = (e, type) => {
@@ -80,24 +69,6 @@ const AddOrEditExerciseModal = ({
                             value={isButtonAddClick ? newExercise.description : currentExercise.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
                             placeholder="Exercise Description"
-                        />
-                    </FormControl>
-                    <FormControl mb="4">
-                        <FormLabel>Set count</FormLabel>
-                        <Input
-                            type='number'
-                            value={isButtonAddClick ? newExercisePlan.setCount : currentExercisePlan.setCount}
-                            onChange={(e) => handleInputChange('setCount', e.target.value)}
-                            placeholder="0"
-                        />
-                    </FormControl>
-                    <FormControl mb="4">
-                        <FormLabel>Rep count</FormLabel>
-                        <Input
-                            type='number'
-                            value={isButtonAddClick ? newExercisePlan.repCount : currentExercisePlan.repCount}
-                            onChange={(e) => handleInputChange('repCount', e.target.value)}
-                            placeholder="0"
                         />
                     </FormControl>
                     <FormControl mb="4">

@@ -13,7 +13,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-const ShowVideoModal = ({ isOpen, onClose, currentVideoPath, dataSelectedRow }) => {
+const ShowVideoModal = ({ type, isOpen, onClose, currentVideoPath, dataSelectedRow }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -26,18 +26,24 @@ const ShowVideoModal = ({ isOpen, onClose, currentVideoPath, dataSelectedRow }) 
               <source src={currentVideoPath} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-            
-            <Flex mt='3rem' paddingX='3rem'>
-              <Flex w='50%' flexDirection='column' alignItems='center'>
-                <Text fontSize='2xl' fontWeight='700'>{dataSelectedRow.setCount}</Text>
-                <Text fontSize='sm'>{dataSelectedRow.setCount >= 2 ? 'Sets' : 'Set'}</Text>
+            {type === 'exercise plan' &&
+              <Flex mt='3rem'>
+                <Flex w='50%' flexDirection='column' alignItems='center'>
+                  <Text fontSize='2xl' fontWeight='700'>{dataSelectedRow.setCount}</Text>
+                  <Text fontSize='sm'>{dataSelectedRow.setCount >= 2 ? 'Sets' : 'Set'}</Text>
+                </Flex>
+                
+                <Flex w='50%' flexDirection='column' alignItems='center'>
+                  <Text fontSize='2xl' fontWeight='700'>{dataSelectedRow.repCount}</Text>
+                  <Text fontSize='sm'>{dataSelectedRow.repCount >= 2 ? 'Reps' : 'Rep'}</Text>
+                </Flex>
+
+                <Flex w='50%' flexDirection='column' alignItems='center'>
+                  <Text fontSize='2xl' fontWeight='700'>{dataSelectedRow.restTime}</Text>
+                  <Text fontSize='sm'>Rests</Text>
+                </Flex>
               </Flex>
-              
-              <Flex w='50%' flexDirection='column' alignItems='center'>
-                <Text fontSize='2xl' fontWeight='700'>{dataSelectedRow.repCount}</Text>
-                <Text fontSize='sm'>{dataSelectedRow.repCount >= 2 ? 'Reps' : 'Rep'}</Text>
-              </Flex>
-            </Flex>
+            }
           </Box>
         </ModalBody>
         <ModalFooter>
