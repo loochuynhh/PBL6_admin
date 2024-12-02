@@ -44,7 +44,8 @@ export default function ExerciseTable() {
     description: null,
     videoPath: null,
     imagePath: null,
-    userId: 0
+    userId: 0,
+    met: 0
   });
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
@@ -129,7 +130,8 @@ export default function ExerciseTable() {
       description: currentExercise.description,
       imagePath: null,
       videoPath: null,
-      userId: currentExercise.userId
+      userId: currentExercise.userId,
+      met: 0
     }
     try {
       await axios.put(`/api/exercises/${currentExercise.id}`, updateExercise, {
@@ -248,7 +250,7 @@ export default function ExerciseTable() {
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
         <TableHeader
-          title="Exercise Table"
+          title="Add Exercise"
           onOpenAdd={handleOpenModalAddExercise}
         />
         
@@ -266,7 +268,9 @@ export default function ExerciseTable() {
         />
 
         <TableRender
-          table={table} 
+          // table={table}
+          data={data}
+          columns={columns}
           onRowClick={null}
           borderColor={borderColor}
           hover={false}

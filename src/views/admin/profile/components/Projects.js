@@ -63,17 +63,9 @@ export default function Projects() {
       setError(null);
 
       try {
-        const allUser = await axios.get(`/api/users/all`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        })
+        const allUser = await axios.get(`/public/api/users/all`)
 
-        const userData = await axios.get(`/api/users?id.greaterThan=1050&page=${currentPage}&size=${pageSize}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
+        const userData = await axios.get(`/public/api/users?id.greaterThan=1050&page=${currentPage}&size=${pageSize}`);
         setUserData(userData.data);
         setTotalUsers(allUser.data.length);
       } catch (err) {

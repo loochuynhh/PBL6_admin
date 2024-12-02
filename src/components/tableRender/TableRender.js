@@ -1,10 +1,26 @@
-import React from 'react';
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Flex } from '@chakra-ui/react';
-import { flexRender } from '@tanstack/react-table'; // Adjust the import based on your setup
+import React, { useState } from 'react';
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Flex, Text } from '@chakra-ui/react';
+import { flexRender, useReactTable, getCoreRowModel, getSortedRowModel } from '@tanstack/react-table';
 
-const TableRender = ({ table, onRowClick, borderColor, hover }) => {
+const TableRender = ({ data, columns, onRowClick, borderColor, hover }) => {
+  const [sorting, setSorting] = useState([]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
   return (
     <Box>
+      {data.length === 0 
+        ? <Text fontSize='1.5rem' fontWeight={'bold'} marginLeft='2rem'>No exercise</Text> 
+        : 
       <Table variant="simple" color="gray.500" mb="24px" mt="12px">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -38,7 +54,7 @@ const TableRender = ({ table, onRowClick, borderColor, hover }) => {
                 _hover: { bg: 'gray.200', transform: "scale(1.02)" },
                 transition: "all 0.2s",
                 cursor: 'pointer',
-                onClick: () => onRowClick(row.original.id),
+                onClick: () => onRowClick(row.original),
               })}
             >
               {row.getVisibleCells().map((cell) => (
@@ -50,6 +66,7 @@ const TableRender = ({ table, onRowClick, borderColor, hover }) => {
           ))}
         </Tbody>
       </Table>
+      }
     </Box>
   );
 };

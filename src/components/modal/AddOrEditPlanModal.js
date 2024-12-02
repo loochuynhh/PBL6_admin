@@ -10,11 +10,12 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   Button,
 } from '@chakra-ui/react';
 
 const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditClick, newPlan, setNewPlan, currentPlan, setCurrentPlan, handleAddPlan, handleUpdatePlan }) => {
+  const inputLabel = ['name', 'description'];
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -22,35 +23,20 @@ const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditCli
         <ModalHeader>{isButtonAddClick ? 'Add New Plan' : (isButtonEditClick && 'Update Plan')}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {['name', 'description', 'totalDays', 'rating', 'status'].map((field, index) => (
+          {inputLabel.map((field, index) => (
             <FormControl mb="4" key={index}>
               <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
-              {field !== 'status' ? (
                 <Input
-                  type={field === 'totalDays' || field === 'rating' ? 'number' : 'text'}
+                  type='text'
                   value={isButtonAddClick ? newPlan[field] : (isButtonEditClick ? currentPlan[field] : '')}
                   onChange={(e) => {
-                    const value = field === 'totalDays' || field === 'rating' ? Number(e.target.value) : e.target.value;
+                    const value = e.target.value;
                     isButtonAddClick 
                       ? setNewPlan({ ...newPlan, [field]: value }) 
                       : isButtonEditClick && setCurrentPlan({ ...currentPlan, [field]: value });
                   }}
-                  placeholder={field === 'totalDays' || field === 'rating' ? '0' : `Plan ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                  placeholder={`Plan ${field.charAt(0).toUpperCase() + field.slice(1)}`}
                 />
-              ) : (
-                <Select
-                  value={isButtonAddClick ? newPlan.status : (isButtonEditClick ? currentPlan.status : '')}
-                  onChange={(e) => {
-                    isButtonAddClick 
-                      ? setNewPlan({ ...newPlan, status: e.target.value }) 
-                      : isButtonEditClick && setCurrentPlan({ ...currentPlan, status: e.target.value });
-                  }}
-                >
-                  <option value="PUBLIC">Public</option>
-                  <option value="PRIVATE">Private</option>
-                  <option value="PENDING">Pending</option>
-                </Select>
-              )}
             </FormControl>
           ))}
         </ModalBody>

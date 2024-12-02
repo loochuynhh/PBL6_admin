@@ -2,12 +2,9 @@ import {
   Text,
   useColorModeValue,
   Button,
+  Box,
+  Flex
 } from '@chakra-ui/react';
-import {
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -19,12 +16,15 @@ import ShowVideoModal from 'components/modal/ShowVideoModal';
 import NotificationModal from 'components/modal/NotificationModal';
 import DeleteConfirmationModal from 'components/modal/DeleteConfirmationModal';
 import AddOrEditExercisePlanModal from 'components/modal/AddOrEditExercisePlanModal';
+import Banner from 'components/menu/Banner';
+import AddNewDayModal from 'components/modal/AddNewDayModal';
 
 export default function ExerciseTable(props) {
-  const {planId, onBack} = props
+  const {type, plan, planId, onBack} = props
+  const [exercisePlanId, setExercisePlanId] = useState(null);
   const [data, setData] = useState([]);
+  const [datePlans, setDatePlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [currentVideoPath, setCurrentVideoPath] = useState('');
@@ -37,15 +37,17 @@ export default function ExerciseTable(props) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isModalAddNewDayOpen, setIsModalAddNewDayOpen] = useState(false);
   const [newDatePlan, setNewDatePlan] = useState({
-    time: null,
-    dateOrder: null,
-    planId: 0
+    time: '',
+    dateOrder: 0,
+    planId: planId
   })
   const [newExercisePlan, setNewExercisePlan] = useState({
     setCount: null,
     repCount: null,
     resTime: null,
+    sequence: null,
     exerciseId: 0,
     datePlanId: 0
   })
@@ -70,7 +72,8 @@ export default function ExerciseTable(props) {
     setIsVideoModalOpen(true)
   }
 
-  const handleOpenModalAddExercise = () => {
+  const handleOpenModalAddExercise = (exercisePlanId) => {
+    setExercisePlanId(exercisePlanId);
     setIsButtonAddClick(true);
     setIsOpen(true);
   };
@@ -100,11 +103,13 @@ export default function ExerciseTable(props) {
       setData((prev) => prev.filter((exercisePlan) => exercisePlan.id !== selectedExercisePlanId));
       setIsSuccess(true);
       setNotificationMessage("The exercise has been deleted successfully.");
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Error deleting exercise:', error);
       setIsSuccess(false);
       setNotificationMessage("There was an error deleting the exercise.");
-    } finally {
+    } 
+    finally {
       setIsNotificationOpen(true);
       setIsOpen(false);
       setIsModalDeleteOpen(false)
@@ -125,28 +130,62 @@ export default function ExerciseTable(props) {
       setData((prev) => prev.map((exercisePlan) => (exercisePlan.id === currentExercisePlan.id ? currentExercisePlan : exercisePlan)));
       setIsSuccess(true);
       setNotificationMessage("The exercise has been updated successfully.");
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Error updating exercise:', error);
       setIsSuccess(false);
       setNotificationMessage("There was an error updating the exercise.");
-    } finally {
+    } 
+    finally {
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
   };
 
+  const handleOpenModalAddNewDay = () => {
+    setIsModalAddNewDayOpen(true);
+  }
+
+  const handleAddDatePlan = async () => {
+    try {
+      await axios.post('/api/date-plans', newDatePlan, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+
+      await axios.put(`/api/plans/${planId}`, {...plan, totalDays: plan.totalDays + 1}, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+
+      setIsSuccess(true);
+      setNotificationMessage("The new day has been added successfully.");
+    }
+    catch (err) {
+      console.log("Error adding new day", err)
+      setIsSuccess(false);
+      setNotificationMessage("There was an error adding the new day.");
+    }
+    finally {
+      setIsNotificationOpen(true);
+      setIsModalAddNewDayOpen(false);
+    }
+  }
+
   // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [{ data: exerciseData }, { data: exercisePlanData }] = await Promise.all([
+        const [{ data: exerciseData }, { data: exercisePlanData }, { data: datePlanData }] = await Promise.all([
           axios.get(`/public/api/exercises/all?planId.equals=${planId}`),
           axios.get('/api/exercise-plans/all', {
             headers: {
               Authorization: `Bearer ${accessToken}`
             }
           }),
-          axios.get(`/api/account`, {
+          axios.get(`/api/date-plans/all?planId.equals=${planId}`, {
             headers: {
               Authorization: `Bearer ${accessToken}`
             }
@@ -167,6 +206,7 @@ export default function ExerciseTable(props) {
         }))
 
         setData(combinedData);
+        setDatePlans(datePlanData);
       }
       catch (error) {
         console.error('Error fetching data:', error);
@@ -177,28 +217,16 @@ export default function ExerciseTable(props) {
     };
 
     fetchData();
-  }, [planId]);
+  }, [planId, accessToken]);
 
   const handleAddExercisePlan = async () => {
     try {
-      const { data: addedDatePlan } = await axios.post(
-        '/api/date-plans',
-        {
-          ...newDatePlan,
-          planId: planId
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        }
-      )
       const { data: addedExercisePlan} = await axios.post(
         '/api/exercise-plans', 
         {
           ...newExercisePlan,
           exerciseId: newExercisePlan.exerciseId,
-          datePlanId: addedDatePlan.id
+          datePlanId: exercisePlanId
         }, 
         {
           headers: {
@@ -229,19 +257,36 @@ export default function ExerciseTable(props) {
     }
   };
 
-  const columns = TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
-  
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+  const findExercisePlanId = (day) => {
+    return datePlans.filter(item => item.dateOrder === parseInt(day.split(' ')[1], 10))[0].id
+  }
+
+  const dayMap = {};
+  datePlans.forEach(item => {
+    const dayKey = `Day ${item.dateOrder}`;
+    dayMap[dayKey] = [];
   });
 
+  data.forEach(item => {
+    const dayKey = `Day ${item.datePlan.dateOrder}`;
+    if (dayMap[dayKey]) {
+      dayMap[dayKey].push(item);
+    }
+  });
+
+  const renderedDays = Object.entries(dayMap)
+  .map(([day, exercises]) => ({ day, exercises }))
+  .sort((a, b) => {
+    const dayA = parseInt(a.day.split(' ')[1], 10);
+    const dayB = parseInt(b.day.split(' ')[1], 10);
+    return dayA - dayB;
+  });
+
+  const columns = type === 'plan' 
+    ? TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal) 
+    : TableColumn('approveExercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
+  // const columns = TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
+  
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -251,10 +296,11 @@ export default function ExerciseTable(props) {
       <Button w='6.5rem' onClick={onBack} leftIcon={<ArrowBackIcon boxSize="15px" />}>
         Back
       </Button>
-      <TableHeader
-        title="Exercise Table"
-        onOpenAdd={handleOpenModalAddExercise}
-      />
+
+      {type === 'plan'
+        ? <TableHeader title="Exercise Table" onOpenAdd={handleOpenModalAddNewDay}/>
+        : <TableHeader title="Exercise"/>
+      }
       
       <AddOrEditExercisePlanModal
         isOpen={isOpen}
@@ -268,20 +314,42 @@ export default function ExerciseTable(props) {
         handleAddExercisePlan={handleAddExercisePlan}
         handleUpdateExercisePlan={handleUpdateExercisePlan}
       />
-
-      <TableRender
-        table={table} 
-        onRowClick={null}
-        borderColor={borderColor}
-        hover={false}
-      />
-
+      
+      {renderedDays.map(({ day, exercises }) => (
+        <Box key={day} paddingX={'20px'}>
+          <Flex align='center'>
+            <Text m='0' fontSize="lg" fontWeight="bold">{day}</Text>
+            {type === 'plan' &&
+              <Banner
+                title="Add Exercise"
+                onOpenAdd={() => handleOpenModalAddExercise(findExercisePlanId(day))}
+              />
+            }
+          </Flex>
+          <TableRender
+            data={exercises}
+            columns={columns}
+            onRowClick={null}
+            borderColor={borderColor}
+            hover={false}
+          />
+        </Box>
+      ))}
+      
       <ShowVideoModal
         type='exercise plan'
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
         currentVideoPath={currentVideoPath}
         dataSelectedRow={dataSelectedRow}
+      />
+
+      <AddNewDayModal
+        isOpen={isModalAddNewDayOpen}
+        onClose={() => setIsModalAddNewDayOpen(false)}
+        newDatePlan={newDatePlan}
+        setNewDatePlan={setNewDatePlan}
+        handleAddDatePlan={handleAddDatePlan}
       />
 
       <DeleteConfirmationModal

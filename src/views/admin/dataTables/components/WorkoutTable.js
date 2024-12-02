@@ -2,11 +2,6 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import {
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import Card from 'components/card/Card';
 import axios from 'axios'; 
 import React, { useEffect, useState } from 'react';
@@ -17,12 +12,13 @@ import TableRender from 'components/tableRender/TableRender';
 import TableHeader from 'components/tableRender/TableHeader';
 import TableColumn from 'components/tableRender/TableColumn';
 import NotificationModal from 'components/modal/NotificationModal';
+import ConfirmApproveModal from 'components/modal/ConfirmApproveModal';
 
-export default function WorkoutTable({ onRowClick }) {
+export default function WorkoutTable(props) {
+  const { type, onRowClick } = props
   const [data, setData] = useState([]);
   const [userId, setUserId] = useState(0)
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPlans, setTotalPlans] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -37,11 +33,15 @@ export default function WorkoutTable({ onRowClick }) {
   const [newPlan, setNewPlan] = useState({
     name: '',
     description: '',
-    totalDays: null,
-    rating: null,
-    status: 'PRIVATE',
+    totalDays: 0,
+    rating: 0,
+    status: 'PUBLIC',
     userId: 0
   });
+  const [stateApproveModal, setStateApproveModal] = useState({
+    isOpen: false,
+    approve: false
+  })
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
@@ -49,39 +49,48 @@ export default function WorkoutTable({ onRowClick }) {
   const pageSize = 10;
   const totalPages = Math.ceil(totalPlans / pageSize);
 
+  const getDataPublicPlan = async () => {
+    try {
+      const [{ data: allPlans }, { data: paginatedPlans }, {data: userData}] = await Promise.all([
+        axios.get('/public/api/plans/all?status.in=PUBLIC'),
+        axios.get(`/public/api/plans?page=${currentPage}&size=${pageSize}`),
+        axios.get(`/api/account`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
+      ]);
+
+      setData(paginatedPlans);
+      setUserId(userData.id)
+      setTotalPlans(allPlans.length);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  const getDataPendingPlan = async () => {
+    try {
+      const { data: totalPendingPlan } = await axios.get(`/public/api/plans/all?status.equals=PENDING_REVIEW`);
+      const { data: PendingPlan } = await axios.get(`/public/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`)
+
+      setTotalPlans(totalPendingPlan.length)
+      setData(PendingPlan)
+    }
+    catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [{ data: allPlans }, { data: paginatedPlans }, {data: userData}] = await Promise.all([
-          axios.get('/api/plans/all', {
-            headers: {
-              Authorization: `Bearer ${accessToken}` 
-            }
-          }),
-          axios.get(`/api/plans?page=${currentPage}&size=${pageSize}`, { 
-            headers: {
-              Authorization: `Bearer ${accessToken}`
-            }
-          }),
-          axios.get(`/api/account`, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`
-            }
-          })
-        ]);
-
-        setData(paginatedPlans);
-        setUserId(userData.id)
-        setTotalPlans(allPlans.length);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true)
+      type === 'plan' ? await getDataPublicPlan() : await getDataPendingPlan()
+      setLoading(false);
     };
 
     fetchData();
-  }, [currentPage, accessToken]);
+  }, [type, currentPage, accessToken]);
   
   const handleAddPlan = async () => {
     try {
@@ -91,7 +100,7 @@ export default function WorkoutTable({ onRowClick }) {
         }
       });
       setData((prev) => [...prev, response.data]);
-      setNewPlan({ name: '', description: '', totalDays: null, rating: null, status: 'PRIVATE' });
+      setNewPlan({ ...newPlan, name: '', description: '' });
       setIsSuccess(true);
       setNotificationMessage('New plan has been added successfully');
     } catch (error) {
@@ -159,18 +168,51 @@ export default function WorkoutTable({ onRowClick }) {
     }
   };
 
-  const columns = TableColumn('plan', textColor, handleEditPlan, handleDeletePlan);
+  const handleOpenModalApprovePlanOrNot = (plan, state) => {
+    setStateApproveModal({
+      ...stateApproveModal,
+      isOpen: true,
+      approve: state
+    })
+    setCurrentPlan(plan)
+  }
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
+  const handleConfirmApproveOrNot = async () => {
+    try {
+      await axios.put(`/api/plans/${currentPlan.id}`,
+        {
+          ...currentPlan,
+          status: stateApproveModal.approve ? 'PUBLIC' : 'PRIVATE'
+        }, 
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+      setData((prev) => prev.filter((plan) => plan.id !== currentPlan.id));
+      setCurrentPlan({});
+      setIsSuccess(true);
+      setNotificationMessage(`The plan has been ${stateApproveModal.approve ? 'approved' : 'rejected'} successfully.`);
+    }
+    catch (error) {
+      console.error(`Error ${stateApproveModal.approve ? 'approving' : 'rejecting'} plan:`, error);
+      setIsSuccess(false);
+      setNotificationMessage(`There was an error ${stateApproveModal.approve ? 'approving' : 'rejecting'} the plan.`);
+    } finally {
+      setIsNotificationOpen(true);
+      setStateApproveModal({
+        ...stateApproveModal,
+        isOpen: false
+      })
+    }
+  }
 
-  const handleInputPageChange = (event) => { 
+  const columns = type === 'plan' 
+    ? TableColumn('plan', textColor, handleEditPlan, handleDeletePlan) 
+    : TableColumn('approve', textColor, handleEditPlan, handleDeletePlan, handleOpenModalApprovePlanOrNot);
+
+  const handleInputPageChange = (event) => {
     setTimeout(() => {
       const value = event.target.value;
       const pageNumber = Number(value) - 1;
@@ -192,7 +234,7 @@ export default function WorkoutTable({ onRowClick }) {
     setIsOpen(false);
     setIsButtonEditClick(false);
     setIsButtonAddClick(false);
-    setNewPlan({ name: '', description: '', totalDays: null, rating: null, status: 'PRIVATE' });
+    setNewPlan({ ...newPlan, name: '', description: '' });
   };
 
   if (loading) {
@@ -201,10 +243,15 @@ export default function WorkoutTable({ onRowClick }) {
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-      <TableHeader title="Plan Table" onOpenAdd={handleOpenModalAddPlan} />
+      {type === 'plan' 
+        ? <TableHeader title="Plan Table" onOpenAdd={handleOpenModalAddPlan} />
+        : <TableHeader title="Approve Plan" />
+      }
+      
       
       <TableRender
-        table={table}
+        data={data}
+        columns={columns}
         onRowClick={onRowClick}
         borderColor={borderColor}
         hover={true}
@@ -235,6 +282,12 @@ export default function WorkoutTable({ onRowClick }) {
         onClose={() => setIsModalDeleteOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
         object='Plan'
+      />
+
+      <ConfirmApproveModal
+        { ...stateApproveModal}
+        onClose={() => setStateApproveModal(false)}
+        handleConfirmApproveOrNot={handleConfirmApproveOrNot}
       />
 
       <NotificationModal
