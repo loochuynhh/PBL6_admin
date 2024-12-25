@@ -1,0 +1,5 @@
+{
+    "navigateFallback": {
+        "rewrite": "/index.html"
+    }
+}
