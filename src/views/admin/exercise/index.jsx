@@ -187,6 +187,8 @@ export default function ExerciseTable() {
 
   const handleAddExercise = async () => {
     try {
+      console.log("Sending data to add exercise:", { ...newExercise, imagePath: null, videoPath: null, userId: userId });
+  
       const addExercise = await axios.post('/api/exercises', 
         { ...newExercise, imagePath: null, videoPath: null, userId: userId }, 
         {
@@ -195,39 +197,51 @@ export default function ExerciseTable() {
           }
         }
       );
-
-      const formDataImage = new FormData()
-      formDataImage.append('image', newExercise.imagePath)
-      await axios.put(`/api/exercises/${addExercise.data.id}/upload-image`, formDataImage, {
+      console.log("Response from adding exercise:", addExercise);
+  
+      const formDataImage = new FormData();
+      formDataImage.append('image', newExercise.imagePath);
+      console.log("Sending image data:", formDataImage);
+      console.log("Exercise ID:", addExercise.data.id);
+      const imageResponse = await axios.put(`/api/exercises/${addExercise.data.id}/upload-image`, formDataImage, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'
         }
-      })
-      
-      const formDataVideo = new FormData()
-      formDataVideo.append('video', newExercise.videoPath)
-      await axios.put(`/api/exercises/${addExercise.data.id}/upload-video`, formDataVideo, {
+      });
+      console.log("Response from uploading image:", imageResponse);
+  
+      const formDataVideo = new FormData();
+      formDataVideo.append('video', newExercise.videoPath);
+      console.log("Sending video data:", formDataVideo);
+      const videoResponse = await axios.put(`/api/exercises/${addExercise.data.id}/upload-video`, formDataVideo, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'
         }
-      })
-
-      setData((prev) => [...prev, addExercise.data])
-      setIsSuccess(true)
-      setNotificationMessage('The exercise has been added successfully.')
-    } 
-    catch (err) {
-      console.log("Error adding exercise", err);
+      });
+      console.log("Response from uploading video:", videoResponse);
+  
+      setData((prev) => [...prev, addExercise.data]);
+      setIsSuccess(true);
+      setNotificationMessage('The exercise has been added successfully.');
+  
+    } catch (err) {
+      if (err.response) {
+        console.log("API error response:", err.response);
+        console.log("Error status:", err.response.status);
+        console.log("Error data:", err.response.data);
+      } else {
+        console.log("Error details:", err.message);
+      }
+  
       setIsSuccess(false);
       setNotificationMessage("There was an error adding the exercise.");
-    } 
-    finally {
+    } finally {
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
-  };
+  }  
 
   const columns = TableColumnExercise(textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
   
