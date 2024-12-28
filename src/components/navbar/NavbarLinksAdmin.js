@@ -65,6 +65,11 @@ export default function HeaderLinks(props) {
     fetchData()
   }, [3000])
 
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    window.location.reload()
+  }
+
   return (
     <Flex
       w={{ sm: '100%', md: 'auto' }}
@@ -224,6 +229,9 @@ export default function HeaderLinks(props) {
               color="red.400"
               borderRadius="8px"
               px="14px"
+              onClick={handleLogout}
+              justifyContent='center'
+              alignItems='center'
             >
               <Text fontSize="sm">Log out</Text>
             </MenuItem>

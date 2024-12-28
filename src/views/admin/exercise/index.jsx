@@ -3,11 +3,6 @@ import {
   useColorModeValue,
   Box
 } from '@chakra-ui/react';
-import {
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -25,7 +20,6 @@ export default function ExerciseTable() {
   const [totalExercises, setTotalExercises] = useState(0);
   const [userId, setUserId] = useState(0) 
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -230,17 +224,6 @@ export default function ExerciseTable() {
   };
 
   const columns = TableColumnExercise(textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
-  
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -250,7 +233,7 @@ export default function ExerciseTable() {
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
         <TableHeader
-          title="Add Exercise"
+          title="Exercise Table"
           onOpenAdd={handleOpenModalAddExercise}
         />
         
@@ -268,7 +251,6 @@ export default function ExerciseTable() {
         />
 
         <TableRender
-          // table={table}
           data={data}
           columns={columns}
           onRowClick={null}

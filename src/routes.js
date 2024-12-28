@@ -40,9 +40,9 @@ const routes = [
     component: <ExerciseTable />,
   },
   {
-    name: 'Profile',
+    name: 'Account',
     layout: '/admin',
-    path: '/profile',
+    path: '/account',
     icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" mb='1rem'/>,
     component: <Profile />,
   },

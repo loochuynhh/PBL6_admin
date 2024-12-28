@@ -24,7 +24,7 @@ const AddNewDayModal = ({ isOpen, onClose, newDatePlan, setNewDatePlan, handleAd
         <ModalCloseButton />
         <ModalBody>
           {inputLabel.map((field, index) => (
-            <FormControl mb="4" key={index}>
+            <FormControl mb="4" key={index} isRequired>
               <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
                 <Input
                   type={field === 'dateOrder' ? 'text' : 'time'}

@@ -21,7 +21,6 @@ import illustration from "assets/img/auth/auth.png";
 // import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
-import { instance } from "../../../IPHelper";
 import axios from "axios";
 
 function SignIn() { // Không cần nhận props
@@ -82,7 +81,7 @@ function SignIn() { // Không cần nhận props
             color={textColorSecondary}
             fontWeight='400'
             fontSize='md'>
-            Enter your email and password to sign in!
+            Enter your username and password to sign in!
           </Text>
         </Box>
         <Flex
@@ -95,7 +94,7 @@ function SignIn() { // Không cần nhận props
           mx={{ base: "auto", lg: "unset" }}
           me='auto'
           mb={{ base: "20px", md: "auto" }}>
-          <FormControl>
+          <FormControl as="form" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
             <FormLabel
               display='flex'
               ms='4px'
@@ -103,13 +102,13 @@ function SignIn() { // Không cần nhận props
               fontWeight='500'
               color={textColor}
               mb='8px'>
-              Email<Text color={brandStars}>*</Text>
+              Username<Text color={brandStars}>*</Text>
             </FormLabel>
             <Input
               isRequired={true}
               variant='auth'
               fontSize='sm'
-              type='email'
+              type='text'
               placeholder='mail@simmmple.com'
               mb='24px'
               fontWeight='500'
@@ -175,7 +174,8 @@ function SignIn() { // Không cần nhận props
               w='100%'
               h='50'
               mb='24px'
-              onClick={handleLogin}> 
+              type="submit"
+            > 
               Sign In
             </Button>
           </FormControl>

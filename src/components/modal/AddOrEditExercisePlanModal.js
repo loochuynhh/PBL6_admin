@@ -82,7 +82,7 @@ const AddOrEditExercisePlanModal = ({
                 <ModalCloseButton />
                 <ModalBody>
                     {isButtonAddClick &&
-                        <FormControl mb="4">
+                        <FormControl mb="4" isRequired>
                             <FormLabel>Select exercise</FormLabel>
                             <Input
                                 value={newExercisePlan.exercise?.name || ''}
@@ -99,7 +99,7 @@ const AddOrEditExercisePlanModal = ({
                             />
                         </FormControl>
                     }
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Set count</FormLabel>
                         <Input
                             type='number'
@@ -108,7 +108,7 @@ const AddOrEditExercisePlanModal = ({
                             placeholder="0"
                         />
                     </FormControl>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Rep count</FormLabel>
                         <Input
                             type='number'
@@ -117,7 +117,7 @@ const AddOrEditExercisePlanModal = ({
                             placeholder="0"
                         />
                     </FormControl>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Rest time</FormLabel>
                         <Input
                             type='number'

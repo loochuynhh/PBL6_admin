@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -28,6 +28,8 @@ const AddOrEditExerciseModal = ({
 }) => {
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
+    const [valueImage, setValueImage] = useState(null);
+    const [valueVideo, setValueVideo] = useState(null);
 
     const handleInputChange = (field, value) => {
         isButtonAddClick 
@@ -38,6 +40,7 @@ const AddOrEditExerciseModal = ({
     const handleFileChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
+            type === 'image' ? setValueImage(file.name) : setValueVideo(file.name);
             handleInputChange(type === 'image' ? 'imagePath' : 'videoPath', file);
         }
     };
@@ -48,14 +51,20 @@ const AddOrEditExerciseModal = ({
         }
     };
 
+    const handleClose = () => {
+        setValueImage(null)
+        setValueVideo(null)
+        onClose();
+    }
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={handleClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>{isButtonAddClick ? 'Add New Exercise' : 'Update Exercise'}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Name</FormLabel>
                         <Input
                             value={isButtonAddClick ? newExercise.name : currentExercise.name}
@@ -63,7 +72,7 @@ const AddOrEditExerciseModal = ({
                             placeholder="Exercise Name"
                         />
                     </FormControl>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Description</FormLabel>
                         <Input
                             value={isButtonAddClick ? newExercise.description : currentExercise.description}
@@ -71,10 +80,10 @@ const AddOrEditExerciseModal = ({
                             placeholder="Exercise Description"
                         />
                     </FormControl>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Image Path</FormLabel>
                         <Input
-                            value={isButtonAddClick ? newExercise.imagePath : currentExercise.imagePath}
+                            value={isButtonAddClick ? valueImage : currentExercise.imagePath}
                             placeholder="Image Path"
                             readOnly
                             w='90%'
@@ -93,10 +102,10 @@ const AddOrEditExerciseModal = ({
                             onChange={(e) => handleFileChange(e, 'image')}
                         />
                     </FormControl>
-                    <FormControl mb="4">
+                    <FormControl mb="4" isRequired>
                         <FormLabel>Video Path</FormLabel>
                         <Input
-                            value={isButtonAddClick ? newExercise.videoPath : currentExercise.videoPath}
+                            value={isButtonAddClick ? valueVideo : currentExercise.videoPath}
                             placeholder="Video Path"
                             readOnly
                             w='90%'
@@ -120,7 +129,7 @@ const AddOrEditExerciseModal = ({
                     <Button colorScheme="blue" onClick={isButtonAddClick ? handleAddExercise : handleUpdateExercise}>
                         {isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
                     </Button>
-                    <Button onClick={onClose} ml={3}>
+                    <Button onClick={handleClose} ml={3}>
                         Cancel
                     </Button>
                 </ModalFooter>

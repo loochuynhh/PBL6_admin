@@ -298,7 +298,7 @@ export default function ExerciseTable(props) {
       </Button>
 
       {type === 'plan'
-        ? <TableHeader title="Exercise Table" onOpenAdd={handleOpenModalAddNewDay}/>
+        ? <TableHeader title="Exercise" onOpenAdd={handleOpenModalAddNewDay}/>
         : <TableHeader title="Exercise"/>
       }
       

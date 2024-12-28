@@ -8,7 +8,7 @@ const TableHeader = ({ title, onOpenAdd }) => {
       <Text color="gray.800" fontSize="22px" fontWeight="700" lineHeight="100%">
         {title}
       </Text>
-      {(title === 'Plan Table' || title === 'Exercise Table' || title === 'Add Exercise') && 
+      {(title === 'Plan Table' || title === 'Exercise Table' || title === 'Exercise') && 
         <Banner type={title} onOpenAdd={onOpenAdd}/>
       }
     </Flex>
