@@ -7,7 +7,6 @@ import {
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import TableRender from 'components/tableRender/TableRender';
 import TableHeader from 'components/tableRender/TableHeader';
@@ -18,6 +17,7 @@ import DeleteConfirmationModal from 'components/modal/DeleteConfirmationModal';
 import AddOrEditExercisePlanModal from 'components/modal/AddOrEditExercisePlanModal';
 import Banner from 'components/menu/Banner';
 import AddNewDayModal from 'components/modal/AddNewDayModal';
+import axiosInstance from '../../../../axiosConfig';
 
 export default function ExerciseTable(props) {
   const {type, plan, planId, onBack} = props
@@ -95,7 +95,7 @@ export default function ExerciseTable(props) {
   
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/exercise-plans/${selectedExercisePlanId}`, {
+      await axiosInstance.delete(`/api/exercise-plans/${selectedExercisePlanId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -118,7 +118,7 @@ export default function ExerciseTable(props) {
 
   const handleUpdateExercisePlan = async () => {
     try {
-      await axios.put(
+      await axiosInstance.put(
         `/api/exercise-plans/${currentExercisePlan.id}`,
         currentExercisePlan,
         {
@@ -148,13 +148,13 @@ export default function ExerciseTable(props) {
 
   const handleAddDatePlan = async () => {
     try {
-      await axios.post('/api/date-plans', newDatePlan, {
+      await axiosInstance.post('/api/date-plans', newDatePlan, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
       })
 
-      await axios.put(`/api/plans/${planId}`, {...plan, totalDays: plan.totalDays + 1}, {
+      await axiosInstance.put(`/api/plans/${planId}`, {...plan, totalDays: plan.totalDays + 1}, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -179,13 +179,13 @@ export default function ExerciseTable(props) {
     const fetchData = async () => {
       try {
         const [{ data: exerciseData }, { data: exercisePlanData }, { data: datePlanData }] = await Promise.all([
-          axios.get(`/public/api/exercises/all?planId.equals=${planId}`),
-          axios.get('/api/exercise-plans/all', {
+          axiosInstance.get(`/public/api/exercises/all?planId.equals=${planId}`),
+          axiosInstance.get('/api/exercise-plans/all', {
             headers: {
               Authorization: `Bearer ${accessToken}`
             }
           }),
-          axios.get(`/api/date-plans/all?planId.equals=${planId}`, {
+          axiosInstance.get(`/api/date-plans/all?planId.equals=${planId}`, {
             headers: {
               Authorization: `Bearer ${accessToken}`
             }
@@ -227,7 +227,7 @@ export default function ExerciseTable(props) {
 
   const handleAddExercisePlan = async () => {
     try {
-      const { data: addedExercisePlan} = await axios.post(
+      const { data: addedExercisePlan} = await axiosInstance.post(
         '/api/exercise-plans', 
         {
           ...newExercisePlan,
@@ -241,7 +241,7 @@ export default function ExerciseTable(props) {
         }
       );
 
-      const { data: exerciseData } = await axios.get(`/public/api/exercises/${addedExercisePlan.exerciseId}`)
+      const { data: exerciseData } = await axiosInstance.get(`/public/api/exercises/${addedExercisePlan.exerciseId}`)
 
       const combinedData = {
         ...addedExercisePlan,

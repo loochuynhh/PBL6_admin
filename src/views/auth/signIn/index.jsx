@@ -21,8 +21,7 @@ import illustration from "assets/img/auth/auth.png";
 // import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
-import { instance } from "../../../IPHelper";
-import axios from "axios";
+import axiosInstance from "../../../axiosConfig";
 
 function SignIn() { // Không cần nhận props
   const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
@@ -37,7 +36,7 @@ function SignIn() { // Không cần nhận props
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("/api/auth/login", {
+      const response = await axiosInstance.post("/api/auth/login", {
         username: email,
         password: password,
       });
@@ -147,17 +146,6 @@ function SignIn() { // Không cần nhận props
               </InputRightElement>
             </InputGroup>
             <Flex justifyContent='space-between' align='center' mb='24px'>
-              <FormControl display='flex' alignItems='center'>
-                <Checkbox id='remember-login' colorScheme='brandScheme' me='10px' />
-                <FormLabel
-                  htmlFor='remember-login'
-                  mb='0'
-                  fontWeight='normal'
-                  color={textColor}
-                  fontSize='sm'>
-                  Keep me logged in
-                </FormLabel>
-              </FormControl>
               <NavLink to='/auth/forgot-password'>
                 <Text
                   color="brand.500"
@@ -179,7 +167,7 @@ function SignIn() { // Không cần nhận props
               Sign In
             </Button>
           </FormControl>
-          <Flex
+          {/* <Flex
             flexDirection='column'
             justifyContent='center'
             alignItems='start'
@@ -197,7 +185,7 @@ function SignIn() { // Không cần nhận props
                 </Text>
               </NavLink>
             </Text>
-          </Flex>
+          </Flex> */}
         </Flex>
       </Flex>
     </DefaultAuth>

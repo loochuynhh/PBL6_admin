@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../../axiosConfig';
 import TableRender from 'components/tableRender/TableRender';
 import TableHeader from 'components/tableRender/TableHeader';
 import ShowVideoModal from 'components/modal/ShowVideoModal';
@@ -103,7 +103,7 @@ export default function ExerciseTable() {
   
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/exercises/${selectedExerciseId}`, {
+      await axiosInstance.delete(`/api/exercises/${selectedExerciseId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -134,13 +134,13 @@ export default function ExerciseTable() {
       met: 0
     }
     try {
-      await axios.put(`/api/exercises/${currentExercise.id}`, updateExercise, {
+      await axiosInstance.put(`/api/exercises/${currentExercise.id}`, updateExercise, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
       })
 
-      const { data: getExerciseUpdated } = await axios.get(`/public/api/exercises/${currentExercise.id}`)
+      const { data: getExerciseUpdated } = await axiosInstance.get(`/public/api/exercises/${currentExercise.id}`)
     
       setData((prev) => prev.map((exercise) => (exercise.id === currentExercise.id ? getExerciseUpdated : exercise)));
       setCurrentExercise({});
@@ -163,13 +163,13 @@ export default function ExerciseTable() {
     const fetchData = async () => {
       try {
         const [{ data: exerciseData }, { data: userData }, { data: allExerciseData }] = await Promise.all([
-          axios.get(`/public/api/exercises?page=${currentPage}&size=${pageSize}`),
-          axios.get(`/api/account`, {
+          axiosInstance.get(`/public/api/exercises?page=${currentPage}&size=${pageSize}`),
+          axiosInstance.get(`/api/account`, {
             headers: {
               Authorization: `Bearer ${accessToken}`
             }
           }),
-          axios.get('/public/api/exercises/all')
+          axiosInstance.get('/public/api/exercises/all')
         ])
 
         setData(exerciseData);
@@ -189,7 +189,7 @@ export default function ExerciseTable() {
     try {
       console.log("Sending data to add exercise:", { ...newExercise, imagePath: null, videoPath: null, userId: userId });
   
-      const addExercise = await axios.post('/api/exercises', 
+      const addExercise = await axiosInstance.post('/api/exercises', 
         { ...newExercise, imagePath: null, videoPath: null, userId: userId }, 
         {
           headers: {
@@ -203,7 +203,7 @@ export default function ExerciseTable() {
       formDataImage.append('image', newExercise.imagePath);
       console.log("Sending image data:", formDataImage);
       console.log("Exercise ID:", addExercise.data.id);
-      const imageResponse = await axios.put(`/api/exercises/${addExercise.data.id}/upload-image`, formDataImage, {
+      const imageResponse = await axiosInstance.put(`/api/exercises/${addExercise.data.id}/upload-image`, formDataImage, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'
@@ -214,7 +214,7 @@ export default function ExerciseTable() {
       const formDataVideo = new FormData();
       formDataVideo.append('video', newExercise.videoPath);
       console.log("Sending video data:", formDataVideo);
-      const videoResponse = await axios.put(`/api/exercises/${addExercise.data.id}/upload-video`, formDataVideo, {
+      const videoResponse = await axiosInstance.put(`/api/exercises/${addExercise.data.id}/upload-video`, formDataVideo, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'

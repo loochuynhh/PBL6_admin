@@ -13,7 +13,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "@chakra-ui/react";
-import axios from "axios";
+import axiosInstance from "../../../../axiosConfig";
 import Card from "components/card/Card.js";
 import Project from "views/admin/profile/components/Project";
 // import Project1 from "assets/img/profile/Project1.png"
@@ -63,13 +63,13 @@ export default function Projects() {
       setError(null);
 
       try {
-        const allUser = await axios.get(`/public/api/users/all`, {
+        const allUser = await axiosInstance.get(`/public/api/users/all`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }
         })
 
-        const userData = await axios.get(`/public/api/users?id.greaterThan=1050&page=${currentPage}&size=${pageSize}`, {
+        const userData = await axiosInstance.get(`/public/api/users?id.greaterThan=1050&page=${currentPage}&size=${pageSize}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }
@@ -89,7 +89,7 @@ export default function Projects() {
 
   const fetchUserAttribute = async (userId) => {
     try {
-      const userAttribute = await axios.get(`/api/user-attributes/all?userId.equals=${userId}`, {
+      const userAttribute = await axiosInstance.get(`/api/user-attributes/all?userId.equals=${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -116,7 +116,7 @@ export default function Projects() {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/users/${selectedUserId}`, {
+      await axiosInstance.delete(`/api/users/${selectedUserId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
