@@ -3,7 +3,8 @@ import {
   useColorModeValue,
   Button,
   Box,
-  Flex
+  Flex,
+  Spinner
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ export default function ExerciseTable(props) {
   const [data, setData] = useState([]);
   const [datePlans, setDatePlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingAPI, setLoadingAPI] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [currentVideoPath, setCurrentVideoPath] = useState('');
@@ -94,6 +96,7 @@ export default function ExerciseTable(props) {
 
   
   const handleConfirmDelete = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.delete(`/api/exercise-plans/${selectedExercisePlanId}`, {
         headers: {
@@ -110,6 +113,7 @@ export default function ExerciseTable(props) {
       setNotificationMessage("There was an error deleting the exercise.");
     } 
     finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
       setIsModalDeleteOpen(false)
@@ -117,6 +121,7 @@ export default function ExerciseTable(props) {
   };
 
   const handleUpdateExercisePlan = async () => {
+    setLoadingAPI(true);
     try {
       await axiosInstance.put(
         `/api/exercise-plans/${currentExercisePlan.id}`,
@@ -137,6 +142,7 @@ export default function ExerciseTable(props) {
       setNotificationMessage("There was an error updating the exercise.");
     } 
     finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -147,6 +153,7 @@ export default function ExerciseTable(props) {
   }
 
   const handleAddDatePlan = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.post('/api/date-plans', newDatePlan, {
         headers: {
@@ -169,6 +176,7 @@ export default function ExerciseTable(props) {
       setNotificationMessage("There was an error adding the new day.");
     }
     finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsModalAddNewDayOpen(false);
     }
@@ -226,6 +234,7 @@ export default function ExerciseTable(props) {
   }, [planId, accessToken]);
 
   const handleAddExercisePlan = async () => {
+    setLoadingAPI(true)
     try {
       const { data: addedExercisePlan} = await axiosInstance.post(
         '/api/exercise-plans', 
@@ -258,6 +267,7 @@ export default function ExerciseTable(props) {
       setNotificationMessage("There was an error adding the exercise plan.");
     } 
     finally {
+      setLoadingAPI(false)
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -306,17 +316,14 @@ export default function ExerciseTable(props) {
   const columns = type === 'plan' 
     ? TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal) 
     : TableColumn('approveExercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
-  // const columns = TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
   
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+  if (loading) return <Spinner color="blue.500" />;
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-      <Button w='6.5rem' onClick={onBack} leftIcon={<ArrowBackIcon boxSize="15px" />}>
+      {/* <Button w='6.5rem' onClick={onBack} leftIcon={<ArrowBackIcon boxSize="15px" />}>
         Back
-      </Button>
+      </Button> */}
 
       {type === 'plan'
         ? <TableHeader title="Exercise" onOpenAdd={handleOpenModalAddNewDay}/>
@@ -334,6 +341,7 @@ export default function ExerciseTable(props) {
         setCurrentExercisePlan={setCurrentExercisePlan}
         handleAddExercisePlan={handleAddExercisePlan}
         handleUpdateExercisePlan={handleUpdateExercisePlan}
+        loading={loadingAPI}
       />
       
       {renderedDays.map(({ day, exercises }) => (
@@ -342,7 +350,7 @@ export default function ExerciseTable(props) {
             <Text m='0' fontSize="lg" fontWeight="bold">{day}</Text>
             {type === 'plan' &&
               <Banner
-                title="Add Exercise"
+                type="Exercise Table"
                 onOpenAdd={() => handleOpenModalAddExercise(findExercisePlanId(day))}
               />
             }
@@ -371,6 +379,7 @@ export default function ExerciseTable(props) {
         newDatePlan={newDatePlan}
         setNewDatePlan={setNewDatePlan}
         handleAddDatePlan={handleAddDatePlan}
+        loading={loadingAPI}
       />
 
       <DeleteConfirmationModal
@@ -378,6 +387,7 @@ export default function ExerciseTable(props) {
         onClose={() => setIsModalDeleteOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
         object='Exercise'
+        loading={loadingAPI}
       />
 
       <NotificationModal

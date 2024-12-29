@@ -1,4 +1,5 @@
 import {
+  Spinner,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -19,6 +20,7 @@ export default function WorkoutTable(props) {
   const [data, setData] = useState([]);
   const [userId, setUserId] = useState(0)
   const [loading, setLoading] = useState(true);
+  const [loadingAPI, setLoadingAPI] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPlans, setTotalPlans] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +74,11 @@ export default function WorkoutTable(props) {
   const getDataPendingPlan = async () => {
     try {
       const { data: totalPendingPlan } = await axiosInstance.get(`/public/api/plans/all?status.equals=PENDING_REVIEW`);
-      const { data: PendingPlan } = await axiosInstance.get(`/public/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`)
+      const { data: PendingPlan } = await axiosInstance.get(`/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
 
       setTotalPlans(totalPendingPlan.length)
       setData(PendingPlan)
@@ -93,6 +99,7 @@ export default function WorkoutTable(props) {
   }, [type, currentPage, accessToken]);
   
   const handleAddPlan = async () => {
+    setLoadingAPI(true)
     try {
       const response = await axiosInstance.post('/api/plans', { ...newPlan, userId: userId}, { 
         headers: {
@@ -108,6 +115,7 @@ export default function WorkoutTable(props) {
       setIsSuccess(false);
       setNotificationMessage("There was an error adding the plan.");
     } finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -119,6 +127,7 @@ export default function WorkoutTable(props) {
   };
 
   const handleConfirmDelete = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.delete(`/api/plans/${selectedPlanId}`, {
         headers: {
@@ -135,6 +144,7 @@ export default function WorkoutTable(props) {
       setNotificationMessage("There was an error Deleting the plan.")
     }
     finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
       setIsModalDeleteOpen(false)
@@ -148,6 +158,7 @@ export default function WorkoutTable(props) {
   };
 
   const handleUpdatePlan = async () => {
+    setLoadingAPI(true)
     try {
       const response = await axiosInstance.put(`/api/plans/${currentPlan.id}`, currentPlan, {
         headers: {
@@ -163,6 +174,7 @@ export default function WorkoutTable(props) {
       setIsSuccess(false);
       setNotificationMessage("There was an error updating the plan.");
     } finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -178,6 +190,7 @@ export default function WorkoutTable(props) {
   }
 
   const handleConfirmApproveOrNot = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.put(`/api/plans/${currentPlan.id}`,
         {
@@ -200,6 +213,7 @@ export default function WorkoutTable(props) {
       setIsSuccess(false);
       setNotificationMessage(`There was an error ${stateApproveModal.approve ? 'approving' : 'rejecting'} the plan.`);
     } finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setStateApproveModal({
         ...stateApproveModal,
@@ -237,9 +251,7 @@ export default function WorkoutTable(props) {
     setNewPlan({ ...newPlan, name: '', description: '' });
   };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+  if (loading) return <Spinner color="blue.500" />;
 
   return (
     <Card flexDirection="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
@@ -275,6 +287,7 @@ export default function WorkoutTable(props) {
         setCurrentPlan={setCurrentPlan}
         handleAddPlan={handleAddPlan}
         handleUpdatePlan={handleUpdatePlan}
+        loading={loadingAPI}
       />
 
       <DeleteConfirmationModal
@@ -282,12 +295,14 @@ export default function WorkoutTable(props) {
         onClose={() => setIsModalDeleteOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
         object='Plan'
+        loading={loadingAPI}
       />
 
       <ConfirmApproveModal
         { ...stateApproveModal}
         onClose={() => setStateApproveModal(false)}
         handleConfirmApproveOrNot={handleConfirmApproveOrNot}
+        loading={loadingAPI}
       />
 
       <NotificationModal

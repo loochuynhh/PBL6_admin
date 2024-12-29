@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button } from '@chakra-ui/react';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Spinner } from '@chakra-ui/react';
 
-const ConfirmApproveModal = ({ isOpen, approve, onClose, handleConfirmApproveOrNot }) => {
+const ConfirmApproveModal = ({ isOpen, approve, onClose, handleConfirmApproveOrNot, loading }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -13,7 +13,7 @@ const ConfirmApproveModal = ({ isOpen, approve, onClose, handleConfirmApproveOrN
         </ModalBody>
         <ModalFooter pr=".5rem">
           <Button colorScheme="red" onClick={handleConfirmApproveOrNot}>
-            Yes, {approve ? 'approve': 'reject'}
+            {loading ? <Spinner color='white' /> : approve ? 'Yes, approve': 'Yes, reject'}
           </Button>
           <Button variant="ghost" border="1px solid #333" ml='.5rem' onClick={onClose}>
             Cancel

@@ -11,6 +11,7 @@ import {
     FormLabel,
     Input,
     Button,
+    Spinner,
 } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
 import AddExerciseModal from './AddExerciseModal';
@@ -27,6 +28,7 @@ const AddOrEditExercisePlanModal = ({
     setCurrentExercisePlan,
     handleAddExercisePlan,
     handleUpdateExercisePlan,
+    loading
 }) => {
     const [exerciseModal, setExerciseModal] = useState({
         isOpenExerciseModal: false,
@@ -129,7 +131,7 @@ const AddOrEditExercisePlanModal = ({
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="blue" onClick={isButtonAddClick ? handleAddExercisePlan : handleUpdateExercisePlan}>
-                        {isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
+                        {loading ? <Spinner color='white' /> : isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
                     </Button>
                     <Button onClick={onClose} ml={3}>
                         Cancel

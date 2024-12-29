@@ -11,9 +11,10 @@ import {
   FormLabel,
   Input,
   Button,
+  Spinner,
 } from '@chakra-ui/react';
 
-const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditClick, newPlan, setNewPlan, currentPlan, setCurrentPlan, handleAddPlan, handleUpdatePlan }) => {
+const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditClick, newPlan, setNewPlan, currentPlan, setCurrentPlan, handleAddPlan, handleUpdatePlan, loading }) => {
   const inputLabel = ['name', 'description'];
 
   const isFormValid = inputLabel.every((field) => 
@@ -59,7 +60,7 @@ const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditCli
             onClick={isButtonAddClick ? handleAddPlan : handleUpdatePlan}
             disabled={!isFormValid}
           >
-            {isButtonAddClick ? 'Add Plan' : 'Update Plan'}
+            {loading ? <Spinner color='white'/> : isButtonAddClick ? 'Add Plan' : 'Update Plan'}
           </Button>
           <Button onClick={onClose} ml={3}>
             Cancel

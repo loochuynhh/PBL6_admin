@@ -11,9 +11,10 @@ import {
   FormLabel,
   Input,
   Button,
+  Spinner,
 } from '@chakra-ui/react';
 
-const AddNewDayModal = ({ isOpen, onClose, newDatePlan, setNewDatePlan, handleAddDatePlan }) => {
+const AddNewDayModal = ({ isOpen, onClose, newDatePlan, setNewDatePlan, handleAddDatePlan, loading }) => {
   const inputLabel = ['dateOrder', 'time'];
 
   return (
@@ -38,7 +39,7 @@ const AddNewDayModal = ({ isOpen, onClose, newDatePlan, setNewDatePlan, handleAd
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" onClick={handleAddDatePlan}>
-            Add new day
+            {loading ? <Spinner color='white' /> : 'Add new day'}
           </Button>
           <Button onClick={onClose} ml={3}>
             Cancel

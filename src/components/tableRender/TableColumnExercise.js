@@ -6,8 +6,8 @@ import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 const columnHelper = createColumnHelper();
 
 const TableColumnExercise = (textColor, handleEdit, handleDelete, handleOpenVideoModal) => [
-    columnHelper.accessor('imagePath', {
-        id: 'imagePath',
+    columnHelper.accessor('publicImageUrl', {
+        id: 'publicImageUrl',
         header: () => (
           <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
             IMAGE

@@ -81,7 +81,7 @@ export default function HeaderLinks(props) {
       borderRadius="30px"
       boxShadow={shadow}
     >
-      <SearchBar
+      {/* <SearchBar
         mb={() => {
           if (secondary) {
             return { base: '10px', md: 'unset' };
@@ -90,9 +90,9 @@ export default function HeaderLinks(props) {
         }}
         me="10px"
         borderRadius="30px"
-      />
-      <SidebarResponsive routes={routes} />
-      <Menu>
+      /> */}
+      {/* <SidebarResponsive routes={routes} /> */}
+      {/* <Menu>
         <MenuButton p="0px">
           <Icon
             as={MdNotificationsNone}
@@ -149,28 +149,8 @@ export default function HeaderLinks(props) {
           </Flex>
 
         </MenuList>
-      </Menu>
+      </Menu> */}
 
-      <Button
-        variant="no-hover"
-        bg="transparent"
-        p="0px"
-        minW="unset"
-        minH="unset"
-        h="18px"
-        w="max-content"
-        mx='.5rem'
-        border='1px solid #333'
-        onClick={toggleColorMode}
-      >
-        <Icon
-          me="10px"
-          h="18px"
-          w="18px"
-          color={navbarIcon}
-          as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
-        />
-      </Button>
       <Menu>
         <MenuButton p="0px">
           <Avatar
@@ -205,6 +185,30 @@ export default function HeaderLinks(props) {
             >
               👋&nbsp; Hey, {username}
             </Text>
+
+            <Button
+              variant="no-hover"
+              bg="transparent"
+              p="0px"
+              minW="unset"
+              minH="unset"
+              h="18px"
+              w="max-content"
+              mx='.5rem'
+              alignSelf='center'
+              mb='.5rem'
+              mr='2rem'
+              border='1px solid #333'
+              onClick={toggleColorMode}
+            >
+              <Icon
+                me="10px"
+                h="18px"
+                w="18px"
+                color={navbarIcon}
+                as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
+              />
+            </Button>
           </Flex>
           <Flex flexDirection="column" p="10px">
             {/* <MenuItem

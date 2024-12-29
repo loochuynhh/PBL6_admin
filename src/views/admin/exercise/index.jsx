@@ -1,7 +1,8 @@
 import {
   Text,
   useColorModeValue,
-  Box
+  Box,
+  Spinner
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ export default function ExerciseTable() {
   const [totalExercises, setTotalExercises] = useState(0);
   const [userId, setUserId] = useState(0) 
   const [loading, setLoading] = useState(true);
+  const [loadingAPI, setLoadingAPI] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -96,6 +98,7 @@ export default function ExerciseTable() {
   };
   
   const handleConfirmDelete = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.delete(`/api/exercises/${selectedExerciseId}`, {
         headers: {
@@ -112,6 +115,7 @@ export default function ExerciseTable() {
       setNotificationMessage("There was an error deleting the exercise.");
     }
     finally {
+      setLoadingAPI(false)
       setIsNotificationOpen(true);
       setIsOpen(false);
       setIsModalDeleteOpen(false)
@@ -127,12 +131,37 @@ export default function ExerciseTable() {
       userId: currentExercise.userId,
       met: 0
     }
+    setLoadingAPI(true)
     try {
       await axiosInstance.put(`/api/exercises/${currentExercise.id}`, updateExercise, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
       })
+
+      const formDataImage = new FormData();
+      formDataImage.append('image', currentExercise.imagePath);
+      console.log("Sending image data:", formDataImage);
+      console.log("Exercise ID:", currentExercise.id);
+      const imageResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log("Response from uploading image:", imageResponse);
+
+      const formDataVideo = new FormData();
+      formDataVideo.append('video', currentExercise.videoPath);
+      console.log('Current exercise video: ', currentExercise.videoPath)
+      console.log("Sending video data:", formDataVideo);
+      const videoResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-video`, formDataVideo, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log("Response from uploading video:", videoResponse);
 
       const { data: getExerciseUpdated } = await axiosInstance.get(`/public/api/exercises/${currentExercise.id}`)
     
@@ -147,6 +176,7 @@ export default function ExerciseTable() {
       setNotificationMessage("There was an error updating the exercise.");
     } 
     finally {
+      setLoadingAPI(false)
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -155,6 +185,7 @@ export default function ExerciseTable() {
   // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       try {
         const [{ data: exerciseData }, { data: userData }, { data: allExerciseData }] = await Promise.all([
           axiosInstance.get(`/public/api/exercises?page=${currentPage}&size=${pageSize}`),
@@ -180,6 +211,7 @@ export default function ExerciseTable() {
   }, [currentPage, accessToken]);
 
   const handleAddExercise = async () => {
+    setLoadingAPI(true)
     try {
       console.log("Sending data to add exercise:", { ...newExercise, imagePath: null, videoPath: null, userId: userId });
   
@@ -215,8 +247,10 @@ export default function ExerciseTable() {
         }
       });
       console.log("Response from uploading video:", videoResponse);
+
+      const {data: getExercise} = await axiosInstance.get(`/public/api/exercises/${addExercise.data.id}`)
   
-      setData((prev) => [...prev, addExercise.data]);
+      setData((prev) => [...prev, getExercise]);
       setIsSuccess(true);
       setNotificationMessage('The exercise has been added successfully.');
   
@@ -232,6 +266,7 @@ export default function ExerciseTable() {
       setIsSuccess(false);
       setNotificationMessage("There was an error adding the exercise.");
     } finally {
+      setLoadingAPI(false)
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
@@ -239,9 +274,7 @@ export default function ExerciseTable() {
 
   const columns = TableColumnExercise(textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+  if (loading) return <Spinner color="blue.500" />;
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -262,6 +295,7 @@ export default function ExerciseTable() {
           setCurrentExercise={setCurrentExercise}
           handleAddExercise={handleAddExercise}
           handleUpdateExercise={handleUpdateExercise}
+          loading={loadingAPI}
         />
 
         <TableRender
@@ -292,6 +326,7 @@ export default function ExerciseTable() {
           onClose={() => setIsModalDeleteOpen(false)}
           handleConfirmDelete={handleConfirmDelete}
           object='Exercise'
+          loading={loadingAPI}
         />
 
         <NotificationModal

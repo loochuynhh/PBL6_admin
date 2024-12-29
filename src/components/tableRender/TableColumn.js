@@ -9,8 +9,8 @@ const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenModalA
 
   if (type === 'exercise') {
     columns.push(
-      columnHelper.accessor('exercise.imagePath', {
-        id: 'imagePath',
+      columnHelper.accessor('exercise.publicImageUrl', {
+        id: 'publicImageUrl',
         header: () => (
           <Text justifyContent="space-between" align="center" fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
             IMAGE
@@ -126,7 +126,7 @@ const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenModalA
             </Text>
           </Box>
         ),
-        size: 15
+        size: 15,
       })
     );
   }

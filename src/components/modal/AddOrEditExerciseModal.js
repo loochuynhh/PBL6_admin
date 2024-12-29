@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -11,6 +11,7 @@ import {
     FormLabel,
     Input,
     Button,
+    Spinner,
 } from '@chakra-ui/react';
 import { LinkIcon } from '@chakra-ui/icons';
 
@@ -25,6 +26,7 @@ const AddOrEditExerciseModal = ({
     setCurrentExercise,
     handleAddExercise,
     handleUpdateExercise,
+    loading
 }) => {
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -127,7 +129,7 @@ const AddOrEditExerciseModal = ({
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="blue" onClick={isButtonAddClick ? handleAddExercise : handleUpdateExercise}>
-                        {isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
+                        {loading ? <Spinner color='white' size='sm'/> : isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
                     </Button>
                     <Button onClick={handleClose} ml={3}>
                         Cancel
