@@ -206,7 +206,12 @@ export default function ExerciseTable(props) {
         }))
 
         setData(combinedData);
-        setDatePlans(datePlanData);
+        // setDatePlans(datePlanData);
+        if (datePlanData && datePlanData.length > 0) {
+          setDatePlans(datePlanData);
+        } else {
+          console.error("No date plans found.");
+        }
       }
       catch (error) {
         console.error('Error fetching data:', error);
@@ -214,6 +219,7 @@ export default function ExerciseTable(props) {
       finally {
         setLoading(false);
       }
+      
     };
 
     fetchData();
@@ -258,7 +264,13 @@ export default function ExerciseTable(props) {
   };
 
   const findExercisePlanId = (day) => {
-    return datePlans.filter(item => item.dateOrder === parseInt(day.split(' ')[1], 10))[0].id
+    // return datePlans.filter(item => item.dateOrder === parseInt(day.split(' ')[1], 10))[0].id
+    if (!datePlans || datePlans.length === 0) {
+      return null; 
+    }
+  
+    const dayData = datePlans.filter(item => item.dateOrder === parseInt(day.split(' ')[1], 10))[0];
+    return dayData ? dayData.id : null;
   }
 
   const dayMap = {};
@@ -267,12 +279,21 @@ export default function ExerciseTable(props) {
     dayMap[dayKey] = [];
   });
 
+  // data.forEach(item => {
+  //   const dayKey = `Day ${item.datePlan.dateOrder}`;
+  //   if (dayMap[dayKey]) {
+  //     dayMap[dayKey].push(item);
+  //   }
+  // });
+
   data.forEach(item => {
-    const dayKey = `Day ${item.datePlan.dateOrder}`;
-    if (dayMap[dayKey]) {
-      dayMap[dayKey].push(item);
+    if (item.datePlan && item.datePlan.dateOrder) {
+      const dayKey = `Day ${item.datePlan.dateOrder}`;
+      if (dayMap[dayKey]) {
+        dayMap[dayKey].push(item);
+      }
     }
-  });
+  });  
 
   const renderedDays = Object.entries(dayMap)
   .map(([day, exercises]) => ({ day, exercises }))

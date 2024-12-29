@@ -59,7 +59,7 @@ const AddExerciseModal = ({ isOpenExerciseModal, exercises, handleClickButtonAdd
                             cursor='pointer'
                             borderRadius='.5rem'
                         >
-                            <Image h='50px' w='50px' alignSelf='center' src={exercise.publicImageUrl}/>
+                            <Image h='50px' w='50px' alignSelf='center' src={exercise.imagePath}/>
                             <Text w='65%' margin='0 auto' alignSelf='center'>{exercise.name}</Text>
 
                             <Button
