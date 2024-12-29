@@ -3,7 +3,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
-import axios from 'axios'; 
+import axiosInstance from '../../../../axiosConfig';
 import React, { useEffect, useState } from 'react';
 import Pagination from 'components/pagination/Paginantion';
 import DeleteConfirmationModal from 'components/modal/DeleteConfirmationModal';
@@ -52,9 +52,9 @@ export default function WorkoutTable(props) {
   const getDataPublicPlan = async () => {
     try {
       const [{ data: allPlans }, { data: paginatedPlans }, {data: userData}] = await Promise.all([
-        axios.get('/public/api/plans/all?status.in=PUBLIC'),
-        axios.get(`/public/api/plans?page=${currentPage}&size=${pageSize}`),
-        axios.get(`/api/account`, {
+        axiosInstance.get('/public/api/plans/all?status.in=PUBLIC'),
+        axiosInstance.get(`/public/api/plans?page=${currentPage}&size=${pageSize}`),
+        axiosInstance.get(`/api/account`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
@@ -71,8 +71,8 @@ export default function WorkoutTable(props) {
 
   const getDataPendingPlan = async () => {
     try {
-      const { data: totalPendingPlan } = await axios.get(`/public/api/plans/all?status.equals=PENDING_REVIEW`);
-      const { data: PendingPlan } = await axios.get(`/public/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`)
+      const { data: totalPendingPlan } = await axiosInstance.get(`/public/api/plans/all?status.equals=PENDING_REVIEW`);
+      const { data: PendingPlan } = await axiosInstance.get(`/public/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`)
 
       setTotalPlans(totalPendingPlan.length)
       setData(PendingPlan)
@@ -94,7 +94,7 @@ export default function WorkoutTable(props) {
   
   const handleAddPlan = async () => {
     try {
-      const response = await axios.post('/api/plans', { ...newPlan, userId: userId}, { 
+      const response = await axiosInstance.post('/api/plans', { ...newPlan, userId: userId}, { 
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -120,7 +120,7 @@ export default function WorkoutTable(props) {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/plans/${selectedPlanId}`, {
+      await axiosInstance.delete(`/api/plans/${selectedPlanId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -149,7 +149,7 @@ export default function WorkoutTable(props) {
 
   const handleUpdatePlan = async () => {
     try {
-      const response = await axios.put(`/api/plans/${currentPlan.id}`, currentPlan, {
+      const response = await axiosInstance.put(`/api/plans/${currentPlan.id}`, currentPlan, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -179,7 +179,7 @@ export default function WorkoutTable(props) {
 
   const handleConfirmApproveOrNot = async () => {
     try {
-      await axios.put(`/api/plans/${currentPlan.id}`,
+      await axiosInstance.put(`/api/plans/${currentPlan.id}`,
         {
           ...currentPlan,
           status: stateApproveModal.approve ? 'PUBLIC' : 'PRIVATE'

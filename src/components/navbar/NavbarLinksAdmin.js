@@ -26,7 +26,7 @@ import { MdNotificationsNone, MdInfoOutline } from 'react-icons/md';
 import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 import { FaEthereum } from 'react-icons/fa';
 import routes from 'routes';
-import axios from 'axios';
+import axiosInstance from '../../axiosConfig';
 export default function HeaderLinks(props) {
   const { secondary } = props;
   const { colorMode, toggleColorMode } = useColorMode();
@@ -49,7 +49,7 @@ export default function HeaderLinks(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const accountData = await axios.get('/api/account', {
+        const accountData = await axiosInstance.get('/api/account', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           }

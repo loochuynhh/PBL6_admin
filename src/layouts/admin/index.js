@@ -8,8 +8,7 @@ import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import routes from 'routes.js';
-import axios from 'axios';
-import { instance } from '../../IPHelper';
+import axiosInstance from '../../axiosConfig';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -24,7 +23,7 @@ export default function Dashboard(props) {
     const accessToken = localStorage.getItem('accessToken'); 
     if (accessToken) {
       try {
-        const response = await axios.get('/api/roles', {
+        const response = await axiosInstance.get('/api/roles', {
           headers: {
             Authorization: `Bearer ${accessToken}`, 
           },

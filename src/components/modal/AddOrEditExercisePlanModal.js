@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
 import AddExerciseModal from './AddExerciseModal';
-import axios from 'axios';
+import axiosInstance from '../../axiosConfig';
 
 const AddOrEditExercisePlanModal = ({
     isOpen,
@@ -36,7 +36,7 @@ const AddOrEditExercisePlanModal = ({
     useEffect(() => {
         const getAllExercise = async () => {
             try {
-                const { data: exerciseData } = await axios.get(`/public/api/exercises/all`)
+                const { data: exerciseData } = await axiosInstance.get(`/public/api/exercises/all`)
 
                 setExerciseModal({ ...exerciseModal, exercises: exerciseData })
             }
