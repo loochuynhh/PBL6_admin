@@ -2,7 +2,6 @@
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Link, Text, useColorModeValue } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
-import AdminNavbarLinks from 'components/navbar/NavbarLinksAdmin';
 
 export default function AdminNavbar(props) {
 	const [ scrolled, setScrolled ] = useState(false);
@@ -120,15 +119,6 @@ export default function AdminNavbar(props) {
 						}}>
 						{brandText}
 					</Link>
-				</Box>
-				<Box ms='auto' w={{ sm: '100%', md: 'unset' }}>
-					<AdminNavbarLinks
-						onOpen={props.onOpen}
-						logoText={props.logoText}
-						secondary={props.secondary}
-						fixed={props.fixed}
-						scrolled={scrolled}
-					/>
 				</Box>
 			</Flex>
 			{secondary ? <Text color='white'>{message}</Text> : null}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Table, Thead, Tbody, Tr, Th, Td, Flex, Text } from '@chakra-ui/react';
 import { flexRender, useReactTable, getCoreRowModel, getSortedRowModel } from '@tanstack/react-table';
 
-const TableRender = ({ data, columns, onRowClick, borderColor, hover }) => {
+const TableRender = ({ type, data, columns, onRowClick, borderColor, hover }) => {
   const [sorting, setSorting] = useState([]);
 
   const table = useReactTable({
@@ -19,7 +19,7 @@ const TableRender = ({ data, columns, onRowClick, borderColor, hover }) => {
   return (
     <Box>
       {data.length === 0 
-        ? <Text fontSize='1.5rem' fontWeight={'bold'} textAlign={'center'}>No exercise</Text> 
+        ? <Text fontSize='1.5rem' fontWeight={'bold'} textAlign={'center'}>No {type === 'plan' ? 'Plan' : 'Exercise'}</Text> 
         : 
       <Table variant="simple" color="gray.500" mb="24px" mt="12px">
         <Thead>

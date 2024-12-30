@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper();
 
-const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenModalApprovePlanOrNot, handleOpenVideoModal) => {
+const TableColumn = (type, textColor, handleEdit, handleDelete, handleOpenVideoModal, handleOpenModalApprovePlanOrNot) => {
   const columns = [];
 
   if (type === 'exercise') {

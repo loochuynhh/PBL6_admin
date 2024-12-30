@@ -1,11 +1,10 @@
 import {
   Spinner,
-  Text,
   useColorModeValue,
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import axiosInstance from '../../../../axiosConfig';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Pagination from 'components/pagination/Paginantion';
 import DeleteConfirmationModal from 'components/modal/DeleteConfirmationModal';
 import AddOrEditPlanModal from 'components/modal/AddOrEditPlanModal';
@@ -51,9 +50,9 @@ export default function WorkoutTable(props) {
   const pageSize = 10;
   const totalPages = Math.ceil(totalPlans / pageSize);
 
-  const getDataPublicPlan = async () => {
+  const getDataPublicPlan = useCallback(async () => {
     try {
-      const [{ data: allPlans }, { data: paginatedPlans }, {data: userData}] = await Promise.all([
+      const [{ data: allPlans }, { data: paginatedPlans }, { data: userData }] = await Promise.all([
         axiosInstance.get('/public/api/plans/all?status.in=PUBLIC'),
         axiosInstance.get(`/public/api/plans?page=${currentPage}&size=${pageSize}`),
         axiosInstance.get(`/api/account`, {
@@ -64,29 +63,28 @@ export default function WorkoutTable(props) {
       ]);
 
       setData(paginatedPlans);
-      setUserId(userData.id)
+      setUserId(userData.id);
       setTotalPlans(allPlans.length);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }
+  }, [currentPage, accessToken]);
 
-  const getDataPendingPlan = async () => {
+  const getDataPendingPlan = useCallback(async () => {
     try {
       const { data: totalPendingPlan } = await axiosInstance.get(`/public/api/plans/all?status.equals=PENDING_REVIEW`);
       const { data: PendingPlan } = await axiosInstance.get(`/api/plans?status.equals=PENDING_REVIEW&page=${currentPage}&size=${pageSize}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
-      })
+      });
 
-      setTotalPlans(totalPendingPlan.length)
-      setData(PendingPlan)
-    }
-    catch (error) {
+      setTotalPlans(totalPendingPlan.length);
+      setData(PendingPlan);
+    } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }
+  }, [currentPage, accessToken]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,7 +94,7 @@ export default function WorkoutTable(props) {
     };
 
     fetchData();
-  }, [type, currentPage, accessToken]);
+  }, [type, currentPage, accessToken, getDataPublicPlan, getDataPendingPlan]);
   
   const handleAddPlan = async () => {
     setLoadingAPI(true)
@@ -260,8 +258,8 @@ export default function WorkoutTable(props) {
         : <TableHeader title="Approve Plan" />
       }
       
-      
       <TableRender
+        type='plan'
         data={data}
         columns={columns}
         onRowClick={onRowClick}

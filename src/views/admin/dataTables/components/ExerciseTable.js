@@ -1,14 +1,14 @@
 import {
   Text,
   useColorModeValue,
-  Button,
+  // Button,
   Box,
   Flex,
   Spinner
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import React, { useEffect, useState } from 'react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
+// import { ArrowBackIcon } from '@chakra-ui/icons';
 import TableRender from 'components/tableRender/TableRender';
 import TableHeader from 'components/tableRender/TableHeader';
 import TableColumn from 'components/tableRender/TableColumn';
@@ -21,7 +21,8 @@ import AddNewDayModal from 'components/modal/AddNewDayModal';
 import axiosInstance from '../../../../axiosConfig';
 
 export default function ExerciseTable(props) {
-  const {type, plan, planId, onBack} = props
+  // const {type, plan, planId, onBack} = props
+  const {type, plan, planId} = props
   const [exercisePlanId, setExercisePlanId] = useState(null);
   const [data, setData] = useState([]);
   const [datePlans, setDatePlans] = useState([]);
@@ -356,6 +357,7 @@ export default function ExerciseTable(props) {
             }
           </Flex>
           <TableRender
+            type={type}
             data={exercises}
             columns={columns}
             onRowClick={null}

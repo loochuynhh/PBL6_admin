@@ -1,5 +1,4 @@
 import {
-  Text,
   useColorModeValue,
   Box,
   Spinner
@@ -20,7 +19,7 @@ export default function ExerciseTable() {
   const [data, setData] = useState([]);
   const [totalExercises, setTotalExercises] = useState(0);
   const [userId, setUserId] = useState(0) 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingAPI, setLoadingAPI] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -299,6 +298,7 @@ export default function ExerciseTable() {
         />
 
         <TableRender
+          type='exercise'
           data={data}
           columns={columns}
           onRowClick={null}

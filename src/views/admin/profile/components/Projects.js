@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Text,
-  useColorModeValue,
   Button,
   Spinner,
   Grid,
@@ -16,30 +15,29 @@ import {
 import axiosInstance from "../../../../axiosConfig";
 import Card from "components/card/Card.js";
 import Project from "views/admin/profile/components/Project";
-// import Project1 from "assets/img/profile/Project1.png"
 import Banner from "views/admin/profile/components/Banner";
 import banner from "assets/img/auth/banner.png";
 import Pagination from "components/pagination/Paginantion";
 import DeleteConfirmationModal from "components/modal/DeleteConfirmationModal";
 import TableHeader from "components/tableRender/TableHeader";
-import TableRender from "components/tableRender/TableRender";
-import UserTableColumns from "components/tableRender/TableColumnProfileUser";
+import NotificationModal from "components/modal/NotificationModal";
 
 export default function Projects() {
-  // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "gray.400";
   const [userData, setUserData] = useState([]);
   const [userAttribute, setUserAttribute] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingAPI, setLoadingAPI] = useState(false)
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday)
@@ -115,6 +113,7 @@ export default function Projects() {
   };
 
   const handleConfirmDelete = async () => {
+    setLoadingAPI(true)
     try {
       await axiosInstance.delete(`/api/users/${selectedUserId}`, {
         headers: {
@@ -124,9 +123,18 @@ export default function Projects() {
       // Refresh the user data after deletion
       setUserData(userData.filter(user => user.id !== selectedUserId));
       setIsModalOpen(false);
+      setIsSuccess(true);
+      setNotificationMessage("The user has been deleted successfully.");
     } catch (err) {
       console.error("Error deleting user", err);
       setError("Error deleting user");
+      setIsSuccess(false);
+      setNotificationMessage("There was an error deleting the user.");
+    }
+    finally {
+      setLoadingAPI(false)
+      setIsModalDeleteOpen(false);
+      setIsNotificationOpen(true);
     }
   };
 
@@ -243,6 +251,14 @@ export default function Projects() {
         onClose={() => setIsModalDeleteOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
         object='User'
+        loading={loadingAPI}
+      />
+
+      <NotificationModal 
+        isOpen={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+        message={notificationMessage}
+        isSuccess={isSuccess}
       />
     </Card>
   );
