@@ -11,6 +11,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -28,10 +29,12 @@ function SignIn() { // Không cần nhận props
   const [show, setShow] = React.useState(false);
   const [email, setEmail] = React.useState(''); // Khởi tạo giá trị email
   const [password, setPassword] = React.useState(''); // Khởi tạo giá trị password
+  const [loading, setLoading] = React.useState(false);
 
   const handleClick = () => setShow(!show);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/api/auth/login", {
         username: email,
@@ -51,6 +54,9 @@ function SignIn() { // Không cần nhận props
         console.error("Đã xảy ra lỗi:", error.message);
         alert(`Đã xảy ra lỗi: ${error.message}`);
       }
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -162,7 +168,7 @@ function SignIn() { // Không cần nhận props
               mb='24px'
               type="submit"
             > 
-              Sign In
+              {loading ? <Spinner size='sm' color="white" /> : 'Sign In'}
             </Button>
           </FormControl>
           {/* <Flex

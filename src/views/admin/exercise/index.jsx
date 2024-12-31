@@ -138,17 +138,17 @@ export default function ExerciseTable() {
         }
       })
 
-      const formDataImage = new FormData();
-      formDataImage.append('image', currentExercise.imagePath);
-      console.log("Sending image data:", formDataImage);
-      console.log("Exercise ID:", currentExercise.id);
-      const imageResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      console.log("Response from uploading image:", imageResponse);
+      // const formDataImage = new FormData();
+      // formDataImage.append('image', currentExercise.imagePath);
+      // console.log("Sending image data:", formDataImage);
+      // console.log("Exercise ID:", currentExercise.id);
+      // const imageResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //     'Content-Type': 'multipart/form-data'
+      //   }
+      // });
+      // console.log("Response from uploading image:", imageResponse);
 
       const formDataVideo = new FormData();
       formDataVideo.append('video', currentExercise.videoPath);
@@ -170,6 +170,8 @@ export default function ExerciseTable() {
       setNotificationMessage("The exercise has been updated successfully.");
     } 
     catch (error) {
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
       console.error('Error updating exercise:', error);
       setIsSuccess(false);
       setNotificationMessage("There was an error updating the exercise.");

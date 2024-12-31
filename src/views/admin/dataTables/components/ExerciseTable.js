@@ -154,15 +154,17 @@ export default function ExerciseTable(props) {
   }
 
   const handleAddDatePlan = async () => {
-    setLoadingAPI(true)
+    setLoadingAPI(true);
     try {
-      await axiosInstance.post('/api/date-plans', newDatePlan, {
+      const { data: addedDatePlan } = await axiosInstance.post('/api/date-plans', newDatePlan, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
-      })
+      });
 
-      await axiosInstance.put(`/api/plans/${planId}`, {...plan, totalDays: plan.totalDays + 1}, {
+      setDatePlans((prev) => [...prev, addedDatePlan]);
+
+      await axiosInstance.put(`/api/plans/${planId}`, { ...plan, totalDays: plan.totalDays + 1 }, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -170,18 +172,17 @@ export default function ExerciseTable(props) {
 
       setIsSuccess(true);
       setNotificationMessage("The new day has been added successfully.");
-    }
-    catch (err) {
-      console.log("Error adding new day", err)
+    } catch (err) {
+      console.log("Error adding new day", err);
       setIsSuccess(false);
       setNotificationMessage("There was an error adding the new day.");
-    }
-    finally {
+    } finally {
       setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsModalAddNewDayOpen(false);
     }
-  }
+  };
+
 
   // Fetch data from API
   useEffect(() => {
@@ -258,7 +259,10 @@ export default function ExerciseTable(props) {
         exercise: exerciseData
       }
 
-      setData((prev) => [ ...prev, combinedData])
+      setData((prevData) => {
+        const updatedData = [...prevData, combinedData]; // Thêm bài tập vào danh sách cũ
+        return updatedData;
+      });
       setIsSuccess(true)
       setNotificationMessage('The exercise plan has been added successfully.')
     } 
@@ -284,35 +288,30 @@ export default function ExerciseTable(props) {
     return dayData ? dayData.id : null;
   }
 
-  const dayMap = {};
-  datePlans.forEach(item => {
-    const dayKey = `Day ${item.dateOrder}`;
-    dayMap[dayKey] = [];
-  });
+  const renderedDays = React.useMemo(() => {
+    const dayMap = {};
+    datePlans.forEach(item => {
+      const dayKey = `Day ${item.dateOrder}`;
+      dayMap[dayKey] = [];
+    });
 
-  // data.forEach(item => {
-  //   const dayKey = `Day ${item.datePlan.dateOrder}`;
-  //   if (dayMap[dayKey]) {
-  //     dayMap[dayKey].push(item);
-  //   }
-  // });
-
-  data.forEach(item => {
-    if (item.datePlan && item.datePlan.dateOrder) {
-      const dayKey = `Day ${item.datePlan.dateOrder}`;
-      if (dayMap[dayKey]) {
-        dayMap[dayKey].push(item);
+    data.forEach(item => {
+      if (item.datePlan && item.datePlan.dateOrder) {
+        const dayKey = `Day ${item.datePlan.dateOrder}`;
+        if (dayMap[dayKey]) {
+          dayMap[dayKey].push(item);
+        }
       }
-    }
-  });  
+    });
 
-  const renderedDays = Object.entries(dayMap)
-  .map(([day, exercises]) => ({ day, exercises }))
-  .sort((a, b) => {
-    const dayA = parseInt(a.day.split(' ')[1], 10);
-    const dayB = parseInt(b.day.split(' ')[1], 10);
-    return dayA - dayB;
-  });
+    return Object.entries(dayMap)
+      .map(([day, exercises]) => ({ day, exercises }))
+      .sort((a, b) => {
+        const dayA = parseInt(a.day.split(' ')[1], 10);
+        const dayB = parseInt(b.day.split(' ')[1], 10);
+        return dayA - dayB;
+      });
+  }, [data, datePlans]);
 
   const columns = type === 'plan' 
     ? TableColumn('exercise', textColor, handleEditExercise, handleDeleteExercise, handleOpenVideoModal) 
@@ -357,7 +356,7 @@ export default function ExerciseTable(props) {
             }
           </Flex>
           <TableRender
-            type={type}
+            type='Exercise'
             data={exercises}
             columns={columns}
             onRowClick={null}
