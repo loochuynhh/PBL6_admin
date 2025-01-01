@@ -48,7 +48,7 @@ const AddOrEditExercisePlanModal = ({
         }
 
         getAllExercise()
-    }, [isButtonAddClick, exerciseModal])
+    }, [isButtonAddClick])
 
     const handleCloseAddExerciseModal = () => {
         setExerciseModal({ ...exerciseModal, isOpenExerciseModal: false })
@@ -59,8 +59,6 @@ const AddOrEditExercisePlanModal = ({
     }
 
     const handleClickButtonAdd = (exercise) => {
-        handleCloseAddExerciseModal()
-
         setNewExercisePlan((prev) => ({
             ...prev,
             exerciseId: exercise.id,
@@ -68,6 +66,8 @@ const AddOrEditExercisePlanModal = ({
                 ...exercise
             }
         }))
+
+        handleCloseAddExerciseModal()
     }
 
     const handleInputChange = (field, value) => {
@@ -140,7 +140,7 @@ const AddOrEditExercisePlanModal = ({
             </ModalContent>
 
             <AddExerciseModal
-                { ...exerciseModal }
+                {...exerciseModal}
                 handleClickButtonAdd={handleClickButtonAdd}
                 onClose={handleCloseAddExerciseModal}
             />

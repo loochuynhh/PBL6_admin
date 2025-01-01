@@ -237,59 +237,52 @@ export default function ExerciseTable(props) {
   }, [planId, accessToken]);
 
   const handleAddExercisePlan = async () => {
-    setLoadingAPI(true)
+    setLoadingAPI(true);
     try {
-      const { data: addedExercisePlan} = await axiosInstance.post(
-        '/api/exercise-plans', 
+      const { data: addedExercisePlan } = await axiosInstance.post(
+        '/api/exercise-plans',
         {
           ...newExercisePlan,
           exerciseId: newExercisePlan.exerciseId,
-          datePlanId: exercisePlanId
-        }, 
+          datePlanId: exercisePlanId,
+        },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
-      const { data: exerciseData } = await axiosInstance.get(`/public/api/exercises/${addedExercisePlan.exerciseId}`)
+      const { data: exerciseData } = await axiosInstance.get(
+        `/public/api/exercises/${addedExercisePlan.exerciseId}`
+      );
 
       const combinedData = {
         ...addedExercisePlan,
-        exercise: exerciseData
-      }
+        exercise: exerciseData,
+      };
 
-      setData((prevData) => {
-        const updatedData = [...prevData, combinedData]; // Thêm bài tập vào danh sách cũ
-        return updatedData;
-      });
+      const updatedData = [...data, combinedData];
+      setData(updatedData);
 
-      setRenderedDays((prevDays) => {
-        const newDays = [...prevDays];
-        const dayKey = `Day ${newExercisePlan.dateOrder}`; // Giả sử bạn có thuộc tính dateOrder trong newExercisePlan
-        const dayIndex = newDays.findIndex(day => day.day === dayKey);
+      setIsSuccess(true);
+      setNotificationMessage('The exercise plan has been added successfully.');
 
-        if (dayIndex !== -1) {
-          newDays[dayIndex].exercises.push(combinedData);
-        }
-
-        return newDays;
-      });
-      setIsSuccess(true)
-      setNotificationMessage('The exercise plan has been added successfully.')
-    } 
-    catch (err) {
-      console.log("Error adding exercise plan", err);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 500);
+    } catch (err) {
+      console.error('Error adding exercise plan:', err);
       setIsSuccess(false);
-      setNotificationMessage("There was an error adding the exercise plan.");
-    } 
-    finally {
-      setLoadingAPI(false)
+      setNotificationMessage('There was an error adding the exercise plan.');
+    } finally {
+      setLoadingAPI(false);
       setIsNotificationOpen(true);
       setIsOpen(false);
     }
   };
+
+
 
   const findExercisePlanId = (day) => {
     // return datePlans.filter(item => item.dateOrder === parseInt(day.split(' ')[1], 10))[0].id
@@ -301,7 +294,7 @@ export default function ExerciseTable(props) {
     return dayData ? dayData.id : null;
   }
 
-  useEffect(() => {
+  useEffect(() => {  
     const dayMap = {};
     datePlans.forEach(item => {
       const dayKey = `Day ${item.dateOrder}`;

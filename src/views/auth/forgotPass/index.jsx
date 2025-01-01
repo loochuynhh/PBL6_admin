@@ -2,6 +2,7 @@ import { Button, Flex, Input, Spinner, Text } from "@chakra-ui/react";
 import axiosInstance from "axiosConfig";
 import NotificationModal from "components/modal/NotificationModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Forgot = () => {
     const [loading, setLoading] = useState(false);
@@ -11,6 +12,7 @@ const Forgot = () => {
         isOpen: false,
         message: ''
     });
+    const navigate = useNavigate();
 
     const handleForgotPassword = async () => {
         setLoading(true);
@@ -37,6 +39,10 @@ const Forgot = () => {
         }
     }
 
+    const handleBackToLogin = () => {
+        navigate('/auth/sign-in');
+    }
+
     return ( 
         <Flex h="100vh" direction="column" align="center" justifyContent="space-around">
             <Text
@@ -46,24 +52,33 @@ const Forgot = () => {
             >
                 Forgot Password
             </Text>
-            <Flex w={"30%"} justifyContent="space-between" alignItems="center" >
-                <Text fontSize="xl" m="0 auto" mr="1rem">Username:</Text>
-                <Input 
-                    type="text"
-                    placeholder="Enter your username"
-                    ml="1rem"
-                    border="1px solid #ccc"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
+            <Flex w={"40%"} justifyContent="space-between" alignItems="center" >
+                <Flex w='65%' justifyContent="space-between" alignItems="center">
+                    <Text fontSize="xl" m="0 auto" mr="1rem">Username:</Text>
+                    <Input 
+                        type="text"
+                        placeholder="Enter your username"
+                        ml="1rem"
+                        border="1px solid #ccc"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </Flex>
+                <Button
+                    colorScheme="green"
+                    onClick={handleForgotPassword}
+                >
+                    {loading 
+                        ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> 
+                        : 'Get new password'
+                    }
+                </Button>
             </Flex>
+            
             <Button
-                colorScheme="green"
-                onClick={handleForgotPassword}
+                colorScheme="blue"
+                onClick={handleBackToLogin}
             >
-                {loading 
-                    ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> 
-                    : 'Get new password'
-                }
+                Back to log in
             </Button>
 
             <NotificationModal
