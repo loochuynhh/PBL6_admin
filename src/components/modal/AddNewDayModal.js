@@ -39,7 +39,13 @@ const AddNewDayModal = ({ isOpen, onClose, newDatePlan, setNewDatePlan, handleAd
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" onClick={handleAddDatePlan}>
-            {loading ? <Spinner color='white' /> : 'Add new day'}
+            {loading ? (
+              <>
+                Please wait <Spinner size="sm" color="white" ml=".5rem" />
+              </>
+            ) : (
+              'Add new day'
+            )}
           </Button>
           <Button onClick={onClose} ml={3}>
             Cancel

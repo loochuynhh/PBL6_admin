@@ -13,7 +13,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, handleConfirmDelete, object,
         </ModalBody>
         <ModalFooter pr=".5rem">
           <Button colorScheme="red" onClick={handleConfirmDelete}>
-            {loading ? <Spinner color='white' /> : 'Yes, Delete'}
+            {loading ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> : 'Yes, Delete'}
           </Button>
           <Button variant="ghost" border="1px solid #333" ml='.5rem' onClick={onClose}>
             Cancel

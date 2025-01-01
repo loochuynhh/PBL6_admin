@@ -21,14 +21,14 @@ import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 import axiosInstance from "../../../axiosConfig";
 
-function SignIn() { // Không cần nhận props
-  const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
+function SignIn() {
+  const navigate = useNavigate();
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.400";
   const brandStars = useColorModeValue("brand.500", "brand.400");
   const [show, setShow] = React.useState(false);
-  const [email, setEmail] = React.useState(''); // Khởi tạo giá trị email
-  const [password, setPassword] = React.useState(''); // Khởi tạo giá trị password
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
   const handleClick = () => setShow(!show);
@@ -112,7 +112,7 @@ function SignIn() { // Không cần nhận props
               variant='auth'
               fontSize='sm'
               type='text'
-              placeholder='mail@simmmple.com'
+              placeholder='Admin'
               mb='24px'
               fontWeight='500'
               size='lg'
@@ -168,28 +168,9 @@ function SignIn() { // Không cần nhận props
               mb='24px'
               type="submit"
             > 
-              {loading ? <Spinner size='sm' color="white" /> : 'Sign In'}
+              {loading ? <>Please wait <Spinner size="sm" color="white" ml="1rem" /></> : 'Sign In'}
             </Button>
           </FormControl>
-          {/* <Flex
-            flexDirection='column'
-            justifyContent='center'
-            alignItems='start'
-            maxW='100%'
-            mt='0px'>
-            <Text color={textColorSecondary} fontWeight='400' fontSize='14px'>
-              Not registered yet?
-              <NavLink to='/auth/sign-up'>
-                <Text
-                  color={textColor}
-                  as='span'
-                  ms='5px'
-                  fontWeight='500'>
-                  Create an Account
-                </Text>
-              </NavLink>
-            </Text>
-          </Flex> */}
         </Flex>
       </Flex>
     </DefaultAuth>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -48,7 +48,7 @@ const AddOrEditExercisePlanModal = ({
         }
 
         getAllExercise()
-    }, [isButtonAddClick])
+    }, [isButtonAddClick, exerciseModal])
 
     const handleCloseAddExerciseModal = () => {
         setExerciseModal({ ...exerciseModal, isOpenExerciseModal: false })
@@ -131,7 +131,7 @@ const AddOrEditExercisePlanModal = ({
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="blue" onClick={isButtonAddClick ? handleAddExercisePlan : handleUpdateExercisePlan}>
-                        {loading ? <Spinner color='white' /> : isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
+                        {loading ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> : isButtonAddClick ? 'Add Exercise' : 'Update Exercise'}
                     </Button>
                     <Button onClick={onClose} ml={3}>
                         Cancel

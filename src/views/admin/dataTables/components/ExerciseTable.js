@@ -41,6 +41,7 @@ export default function ExerciseTable(props) {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isModalAddNewDayOpen, setIsModalAddNewDayOpen] = useState(false);
+  const [renderedDays, setRenderedDays] = useState([]);
   const [newDatePlan, setNewDatePlan] = useState({
     time: '',
     dateOrder: 0,
@@ -263,6 +264,18 @@ export default function ExerciseTable(props) {
         const updatedData = [...prevData, combinedData]; // Thêm bài tập vào danh sách cũ
         return updatedData;
       });
+
+      setRenderedDays((prevDays) => {
+        const newDays = [...prevDays];
+        const dayKey = `Day ${newExercisePlan.dateOrder}`; // Giả sử bạn có thuộc tính dateOrder trong newExercisePlan
+        const dayIndex = newDays.findIndex(day => day.day === dayKey);
+
+        if (dayIndex !== -1) {
+          newDays[dayIndex].exercises.push(combinedData);
+        }
+
+        return newDays;
+      });
       setIsSuccess(true)
       setNotificationMessage('The exercise plan has been added successfully.')
     } 
@@ -288,7 +301,7 @@ export default function ExerciseTable(props) {
     return dayData ? dayData.id : null;
   }
 
-  const renderedDays = React.useMemo(() => {
+  useEffect(() => {
     const dayMap = {};
     datePlans.forEach(item => {
       const dayKey = `Day ${item.dateOrder}`;
@@ -304,13 +317,13 @@ export default function ExerciseTable(props) {
       }
     });
 
-    return Object.entries(dayMap)
+    setRenderedDays(Object.entries(dayMap)
       .map(([day, exercises]) => ({ day, exercises }))
       .sort((a, b) => {
         const dayA = parseInt(a.day.split(' ')[1], 10);
         const dayB = parseInt(b.day.split(' ')[1], 10);
         return dayA - dayB;
-      });
+      }));
   }, [data, datePlans]);
 
   const columns = type === 'plan' 

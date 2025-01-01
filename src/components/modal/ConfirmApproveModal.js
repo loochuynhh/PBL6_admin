@@ -13,7 +13,7 @@ const ConfirmApproveModal = ({ isOpen, approve, onClose, handleConfirmApproveOrN
         </ModalBody>
         <ModalFooter pr=".5rem">
           <Button colorScheme="red" onClick={handleConfirmApproveOrNot}>
-            {loading ? <Spinner color='white' /> : approve ? 'Yes, approve': 'Yes, reject'}
+            {loading ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> : approve ? 'Yes, approve': 'Yes, reject'}
           </Button>
           <Button variant="ghost" border="1px solid #333" ml='.5rem' onClick={onClose}>
             Cancel

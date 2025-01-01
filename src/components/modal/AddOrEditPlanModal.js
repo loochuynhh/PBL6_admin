@@ -60,7 +60,7 @@ const AddOrEditPlanModal = ({ isOpen, onClose, isButtonAddClick, isButtonEditCli
             onClick={isButtonAddClick ? handleAddPlan : handleUpdatePlan}
             disabled={!isFormValid}
           >
-            {loading ? <Spinner color='white'/> : isButtonAddClick ? 'Add Plan' : 'Update Plan'}
+            {loading ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> : isButtonAddClick ? 'Add Plan' : 'Update Plan'}
           </Button>
           <Button onClick={onClose} ml={3}>
             Cancel

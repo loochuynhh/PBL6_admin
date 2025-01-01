@@ -19,7 +19,7 @@ const TableRender = ({ type, data, columns, onRowClick, borderColor, hover }) =>
   return (
     <Box>
       {data.length === 0 
-        ? <Text fontSize='1.5rem' fontWeight={'bold'} textAlign={'center'}>No {type === 'plan' ? 'Plan' : 'Exercise'}</Text> 
+        ? <Text fontSize='1.5rem' fontWeight={'bold'} textAlign={'center'}>Currently No {type === 'plan' ? 'Plan' : 'Exercise'}</Text> 
         : 
       <Table variant="simple" color="gray.500" mb="24px" mt="12px">
         <Thead>
