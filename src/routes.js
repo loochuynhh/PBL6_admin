@@ -4,7 +4,6 @@ import { Icon } from '@chakra-ui/react';
 import {
   MdBarChart,
   MdPerson,
-  MdLock,
   MdStar,
   MdTableChart,
 } from 'react-icons/md';
@@ -15,7 +14,6 @@ import Profile from 'views/admin/profile';
 import DataTables from 'views/admin/dataTables';
 
 // Auth Imports
-import SignInCentered from 'views/auth/signIn';
 import ExerciseTable from 'views/admin/exercise';
 
 const routes = [
@@ -52,14 +50,7 @@ const routes = [
     path: '/approve-plan',
     icon: <Icon as={MdStar} width="20px" height="20px" color="inherit" mb='1rem'/>,
     component: <DataTables type='approve' />,
-  },
-  {
-    name: 'Sign in',
-    layout: '/auth',
-    path: '/sign-in',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" mb='1rem'/>,
-    component: <SignInCentered />,
-  },
+  }
 ];
 
 export default routes;

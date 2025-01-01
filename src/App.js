@@ -1,7 +1,6 @@
 import './assets/css/App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import {} from 'react-router-dom';
-import AuthLayout from './layouts/auth';
 import AdminLayout from './layouts/admin';
 import {
   ChakraProvider,
@@ -9,6 +8,8 @@ import {
 } from '@chakra-ui/react';
 import initialTheme from './theme/theme'; //  { themeGreen }
 import { useState } from 'react';
+import Forgot from 'views/auth/forgotPass';
+import SignIn from 'views/auth/signIn';
 // Chakra imports
 
 export default function Main() {
@@ -17,7 +18,7 @@ export default function Main() {
   return (
     <ChakraProvider theme={currentTheme}>
       <Routes>
-        <Route path="auth/*" element={<AuthLayout />} />
+        <Route path="auth/sign-in" element={<SignIn />} />
         <Route
           path="admin/*"
           element={
@@ -25,6 +26,7 @@ export default function Main() {
           }
         />
         <Route path="/" element={<Navigate to="/admin" replace />} />
+        <Route path="auth/forgot-password" element={<Forgot />} />
       </Routes>
     </ChakraProvider>
   );
