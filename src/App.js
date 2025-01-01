@@ -10,6 +10,7 @@ import initialTheme from './theme/theme'; //  { themeGreen }
 import { useState } from 'react';
 import Forgot from 'views/auth/forgotPass';
 import SignIn from 'views/auth/signIn';
+import FloatingChatbot from './components/chatbot/Chatbot'; 
 // Chakra imports
 
 export default function Main() {
@@ -17,6 +18,7 @@ export default function Main() {
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
   return (
     <ChakraProvider theme={currentTheme}>
+      <FloatingChatbot />
       <Routes>
         <Route path="auth/sign-in" element={<SignIn />} />
         <Route
