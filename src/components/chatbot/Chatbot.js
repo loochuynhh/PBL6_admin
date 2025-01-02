@@ -162,8 +162,8 @@ const Chatbot = () => {
                   className="flex-grow p-2 mr-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <motion.button
-                  onClick={sendMessage}
-                  disabled={loading}
+                  onClick={() => sendMessage(userInputMessage)}
+                  disabled={loading}  
                   className="p-2 bg-indigo-600 text-white rounded-full disabled:bg-gray-300 disabled:cursor-not-allowed"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

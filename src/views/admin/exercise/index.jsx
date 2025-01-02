@@ -138,17 +138,17 @@ export default function ExerciseTable() {
         }
       })
 
-      // const formDataImage = new FormData();
-      // formDataImage.append('image', currentExercise.imagePath);
-      // console.log("Sending image data:", formDataImage);
-      // console.log("Exercise ID:", currentExercise.id);
-      // const imageResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
-      //   headers: {
-      //     Authorization: `Bearer ${accessToken}`,
-      //     'Content-Type': 'multipart/form-data'
-      //   }
-      // });
-      // console.log("Response from uploading image:", imageResponse);
+      const formDataImage = new FormData();
+      formDataImage.append('image', currentExercise.imagePath);
+      console.log("Sending image data:", formDataImage);
+      console.log("Exercise ID:", currentExercise.id);
+      const imageResponse = await axiosInstance.put(`/api/exercises/${currentExercise.id}/upload-image`, formDataImage, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log("Response from uploading image:", imageResponse);
 
       const formDataVideo = new FormData();
       formDataVideo.append('video', currentExercise.videoPath);
