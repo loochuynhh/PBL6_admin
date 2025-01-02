@@ -12,7 +12,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage, handleInputPageCh
       </Button>
       
       <Flex alignItems='center' justifyContent="space-between" width='12%'>
-        <Text>Page</Text>
+        <Text mb='20px'>Page</Text>
         <Input
           type='number'
           placeholder={currentPage + 1}
@@ -23,7 +23,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage, handleInputPageCh
           textAlign="center"
           mb='20px'
         />
-        <Text>
+        <Text mb='20px'>
           of {totalPages}
         </Text>
       </Flex>

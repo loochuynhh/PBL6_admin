@@ -25,6 +25,7 @@ export default function ExerciseTable(props) {
   const {type, plan, planId} = props
   const [exercisePlanId, setExercisePlanId] = useState(null);
   const [data, setData] = useState([]);
+  const [planData, setPlanData] = useState(plan);
   const [datePlans, setDatePlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingAPI, setLoadingAPI] = useState(false);
@@ -165,11 +166,13 @@ export default function ExerciseTable(props) {
 
       setDatePlans((prev) => [...prev, addedDatePlan]);
 
-      await axiosInstance.put(`/api/plans/${planId}`, { ...plan, totalDays: plan.totalDays + 1 }, {
+      await axiosInstance.put(`/api/plans/${planId}`, { ...planData, totalDays: planData.totalDays + 1 }, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
       });
+
+      setPlanData({ ...planData, totalDays: planData.totalDays + 1 });
 
       setIsSuccess(true);
       setNotificationMessage("The new day has been added successfully.");

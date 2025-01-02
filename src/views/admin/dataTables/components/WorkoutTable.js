@@ -220,11 +220,14 @@ export default function WorkoutTable(props) {
     }
   }
 
+  const handleOpenVideoModal = () => {
+  }
+
   const columns = type === 'plan' 
     ? TableColumn('plan', textColor, handleEditPlan, handleDeletePlan) 
-    : TableColumn('approve', textColor, handleEditPlan, handleDeletePlan, handleOpenModalApprovePlanOrNot);
-
-  const handleInputPageChange = (event) => {
+    : TableColumn('approve', textColor, handleEditPlan, handleDeletePlan, handleOpenVideoModal, handleOpenModalApprovePlanOrNot);
+  
+    const handleInputPageChange = (event) => {
     setTimeout(() => {
       const value = event.target.value;
       const pageNumber = Number(value) - 1;

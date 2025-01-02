@@ -26,14 +26,14 @@ const routes = [
   {
     name: 'Plan Table',
     layout: '/admin',
-    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" mb='1rem'/>,
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit"/>,
     path: '/plan-tables',
     component: <DataTables type='plan' />,
   },
   {
     name: 'Exercise Table',
     layout: '/admin',
-    icon: <Icon as={MdTableChart} width="20px" height="20px" color="inherit" mb='1rem'/>,
+    icon: <Icon as={MdTableChart} width="20px" height="20px" color="inherit"/>,
     path: '/exercise-tables',
     component: <ExerciseTable />,
   },
@@ -41,14 +41,14 @@ const routes = [
     name: 'Account',
     layout: '/admin',
     path: '/account',
-    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" mb='1rem'/>,
+    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit"/>,
     component: <Profile />,
   },
   {
     name: 'Approve Plan',
     layout: '/admin',
     path: '/approve-plan',
-    icon: <Icon as={MdStar} width="20px" height="20px" color="inherit" mb='1rem'/>,
+    icon: <Icon as={MdStar} width="20px" height="20px" color="inherit"/>,
     component: <DataTables type='approve' />,
   }
 ];
