@@ -24,8 +24,7 @@ const Forgot = () => {
                 isOpen: true,
                 message: 'Your password has been reset and sent to your email. Please check your email.'
             });
-        }
-        catch (error) {
+        } catch (error) {
             console.error("Error API forgot password", error);
 
             setNotifyState({
@@ -33,53 +32,60 @@ const Forgot = () => {
                 isOpen: true,
                 message: "Username not exist !!!"
             });
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
     const handleBackToLogin = () => {
         navigate('/auth/sign-in');
-    }
+    };
 
-    return ( 
-        <Flex h="100vh" direction="column" align="center" justifyContent="space-around">
-            <Text
-                fontSize="5xl"
-                fontFamily="heading"
-                fontWeight="bold"
-            >
-                Forgot Password
-            </Text>
-            <Flex w={"40%"} justifyContent="space-between" alignItems="center" >
-                <Flex w='65%' justifyContent="space-between" alignItems="center">
-                    <Text fontSize="xl" m="0 auto" mr="1rem">Username:</Text>
-                    <Input 
+    return (
+        <Flex h="100vh" direction="column" align="center" justify="center" bg="gray.50" p={4}>
+            <Flex direction="column" bg="white" shadow="xl" rounded="lg" p={8} w="full" maxW="lg">
+                <Text
+                    fontSize="2xl"
+                    fontWeight="bold"
+                    textAlign="center"
+                    color="blue.600"
+                    mb={6}
+                >
+                    Forgot Password
+                </Text>
+                <Flex direction="column" mb={4}>
+                    <Text fontSize="sm" fontWeight="medium" mb={2} color="gray.700">Username</Text>
+                    <Input
                         type="text"
                         placeholder="Enter your username"
-                        ml="1rem"
-                        border="1px solid #ccc"
+                        variant="outline"
+                        borderColor="gray.300"
+                        focusBorderColor="blue.500"
+                        size="lg"
                         onChange={(e) => setUsername(e.target.value)}
                     />
                 </Flex>
                 <Button
-                    colorScheme="green"
+                    colorScheme="blue"
+                    size="lg"
+                    w="full"
+                    mb={4}
                     onClick={handleForgotPassword}
+                    isLoading={loading}
+                    loadingText="Processing"
                 >
-                    {loading 
-                        ? <>Please wait <Spinner size="sm" color="white" ml=".5rem" /></> 
-                        : 'Get new password'
-                    }
+                    Get New Password
+                </Button>
+                <Button
+                    colorScheme="gray"
+                    variant="outline"
+                    size="lg"
+                    w="full"
+                    onClick={handleBackToLogin}
+                >
+                    Back to Login
                 </Button>
             </Flex>
-            
-            <Button
-                colorScheme="blue"
-                onClick={handleBackToLogin}
-            >
-                Back to log in
-            </Button>
 
             <NotificationModal
                 isOpen={notifyState.isOpen}
@@ -89,6 +95,6 @@ const Forgot = () => {
             />
         </Flex>
     );
-}
- 
+};
+
 export default Forgot;

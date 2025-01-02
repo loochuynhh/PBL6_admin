@@ -2,14 +2,24 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMessageSquare, FiX, FiSend } from 'react-icons/fi';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 import TypingIndicator from '../typingIndicator/TypingIndicator';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [userInput, setUserInput] = useState('');
+  const [userInputMessage, setUserInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef(null);
+
+  const suggestedQuestions = [
+    "How can I track users' workout progress?",
+    "Can I add new exercise routines for users?",
+    "How do I update the workout calendar?",
+    "How can I manage user subscriptions?",
+    "What are the latest workout trends for home fitness?"
+  ];
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
@@ -19,20 +29,28 @@ const Chatbot = () => {
 
   useEffect(scrollToBottom, [messages]);
 
-  const sendMessage = async () => {
-    if (!userInput.trim()) return;
+  const sendMessage = async (message) => {
+    const userMessage = message || userInputMessage;
 
-    const newMessages = [...messages, { sender: 'user', text: userInput }];
+    if (!userMessage.trim()) return;
+
+    const newMessages = [...messages, { sender: 'user', text: userMessage }];
     setMessages(newMessages);
-    setUserInput('');
+    setUserInputMessage('');
     setLoading(true);
 
     try {
-      const response = await axios.post('https://kind-sea-0ddf06010.4.azurestaticapps.net/api/chat', {
-        userInput,
-      });
+      const botReponse = "You are a fitness website admin assistant chatbot. Please provide concise and professional answers. The admin's question is: ";
+      const userInput = `${botReponse}${userMessage}`;
+      const response = await axios.post(
+        'https://kind-sea-0ddf06010.4.azurestaticapps.net/api/chat',
+        { userInput }
+      );
       const botReply = response.data.reply || "Sorry, I didn't understand that.";
-      setMessages([...newMessages, { sender: 'bot', text: botReply }]);
+      setMessages([
+        ...newMessages,
+        { sender: 'bot', text: botReply },
+      ]);
     } catch (error) {
       console.error('Error fetching response:', error);
       setMessages([
@@ -45,6 +63,11 @@ const Chatbot = () => {
     }
 
     setLoading(false);
+  };
+
+  const handleSuggestionClick = (question) => {
+    setShowSuggestions(false);
+    sendMessage(question);
   };
 
   return (
@@ -85,6 +108,20 @@ const Chatbot = () => {
             </div>
 
             <div className="flex-grow overflow-y-auto p-4 bg-gray-50">
+              {showSuggestions && (
+                <div className="mb-4">
+                  <p className="font-semibold text-gray-800 mb-2">Suggested Questions:</p>
+                  {suggestedQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestionClick(question)}
+                      className="block w-full text-left mb-2 p-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              )}
               {messages.map((msg, index) => (
                 <motion.div
                   key={index}
@@ -102,11 +139,12 @@ const Chatbot = () => {
                         : 'bg-white text-gray-800 shadow'
                     }`}
                   >
-                  <p className={msg.sender === 'user' ? 'text-white' : 'text-gray-800'}>
-                    {msg.text}
-                  </p>
-                </div>
-
+                    {msg.sender === 'bot' ? (
+                      <ReactMarkdown className="prose">{msg.text}</ReactMarkdown>
+                    ) : (
+                      <p className="text-white">{msg.text}</p>
+                    )}
+                  </div>
                 </motion.div>
               ))}
               {loading && <TypingIndicator />}
@@ -117,8 +155,8 @@ const Chatbot = () => {
               <div className="flex items-center">
                 <input
                   type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
+                  value={userInputMessage}
+                  onChange={(e) => setUserInputMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder="Type a message..."
                   className="flex-grow p-2 mr-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -142,4 +180,3 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
-
